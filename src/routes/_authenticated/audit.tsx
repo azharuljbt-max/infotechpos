@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { ClipboardList } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/audit")({
+export const Route = createFileRoute("/_authenticated/audit")({
   component: () => (
     <PlaceholderPage
       title="Audit Log"

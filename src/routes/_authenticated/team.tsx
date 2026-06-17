@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { ShieldCheck } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/team")({
+export const Route = createFileRoute("/_authenticated/team")({
   component: () => (
     <PlaceholderPage
       title="Team & Roles"

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { Building2 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/warehouses")({
+export const Route = createFileRoute("/_authenticated/warehouses")({
   component: () => (
     <PlaceholderPage
       title="Warehouses"

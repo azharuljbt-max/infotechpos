@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { Calculator } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/accounting")({
+export const Route = createFileRoute("/_authenticated/accounting")({
   component: () => (
     <PlaceholderPage
       title="Accounting"

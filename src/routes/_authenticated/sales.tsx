@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { BadgePercent } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/sales")({
+export const Route = createFileRoute("/_authenticated/sales")({
   component: () => (
     <PlaceholderPage
       title="Sales"
