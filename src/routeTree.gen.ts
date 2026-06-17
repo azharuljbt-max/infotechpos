@@ -13,6 +13,24 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedSrcRoutesAuthenticatedWarehousesRouteImport } from './routes/_authenticated/src/routes/_authenticated/warehouses'
+import { Route as AuthenticatedSrcRoutesAuthenticatedTeamRouteImport } from './routes/_authenticated/src/routes/_authenticated/team'
+import { Route as AuthenticatedSrcRoutesAuthenticatedSuppliersRouteImport } from './routes/_authenticated/src/routes/_authenticated/suppliers'
+import { Route as AuthenticatedSrcRoutesAuthenticatedStockRouteImport } from './routes/_authenticated/src/routes/_authenticated/stock'
+import { Route as AuthenticatedSrcRoutesAuthenticatedSettingsRouteImport } from './routes/_authenticated/src/routes/_authenticated/settings'
+import { Route as AuthenticatedSrcRoutesAuthenticatedSalesRouteImport } from './routes/_authenticated/src/routes/_authenticated/sales'
+import { Route as AuthenticatedSrcRoutesAuthenticatedReportsRouteImport } from './routes/_authenticated/src/routes/_authenticated/reports'
+import { Route as AuthenticatedSrcRoutesAuthenticatedQuotationsRouteImport } from './routes/_authenticated/src/routes/_authenticated/quotations'
+import { Route as AuthenticatedSrcRoutesAuthenticatedPurchasesRouteImport } from './routes/_authenticated/src/routes/_authenticated/purchases'
+import { Route as AuthenticatedSrcRoutesAuthenticatedProductsRouteImport } from './routes/_authenticated/src/routes/_authenticated/products'
+import { Route as AuthenticatedSrcRoutesAuthenticatedPosRouteImport } from './routes/_authenticated/src/routes/_authenticated/pos'
+import { Route as AuthenticatedSrcRoutesAuthenticatedNotificationsRouteImport } from './routes/_authenticated/src/routes/_authenticated/notifications'
+import { Route as AuthenticatedSrcRoutesAuthenticatedInvoicesRouteImport } from './routes/_authenticated/src/routes/_authenticated/invoices'
+import { Route as AuthenticatedSrcRoutesAuthenticatedExpensesRouteImport } from './routes/_authenticated/src/routes/_authenticated/expenses'
+import { Route as AuthenticatedSrcRoutesAuthenticatedCustomersRouteImport } from './routes/_authenticated/src/routes/_authenticated/customers'
+import { Route as AuthenticatedSrcRoutesAuthenticatedCompaniesRouteImport } from './routes/_authenticated/src/routes/_authenticated/companies'
+import { Route as AuthenticatedSrcRoutesAuthenticatedAuditRouteImport } from './routes/_authenticated/src/routes/_authenticated/audit'
+import { Route as AuthenticatedSrcRoutesAuthenticatedAccountingRouteImport } from './routes/_authenticated/src/routes/_authenticated/accounting'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -33,16 +51,160 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSrcRoutesAuthenticatedWarehousesRoute =
+  AuthenticatedSrcRoutesAuthenticatedWarehousesRouteImport.update({
+    id: '/src/routes/_authenticated/warehouses',
+    path: '/src/routes/warehouses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedTeamRoute =
+  AuthenticatedSrcRoutesAuthenticatedTeamRouteImport.update({
+    id: '/src/routes/_authenticated/team',
+    path: '/src/routes/team',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedSuppliersRoute =
+  AuthenticatedSrcRoutesAuthenticatedSuppliersRouteImport.update({
+    id: '/src/routes/_authenticated/suppliers',
+    path: '/src/routes/suppliers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedStockRoute =
+  AuthenticatedSrcRoutesAuthenticatedStockRouteImport.update({
+    id: '/src/routes/_authenticated/stock',
+    path: '/src/routes/stock',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedSettingsRoute =
+  AuthenticatedSrcRoutesAuthenticatedSettingsRouteImport.update({
+    id: '/src/routes/_authenticated/settings',
+    path: '/src/routes/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedSalesRoute =
+  AuthenticatedSrcRoutesAuthenticatedSalesRouteImport.update({
+    id: '/src/routes/_authenticated/sales',
+    path: '/src/routes/sales',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedReportsRoute =
+  AuthenticatedSrcRoutesAuthenticatedReportsRouteImport.update({
+    id: '/src/routes/_authenticated/reports',
+    path: '/src/routes/reports',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedQuotationsRoute =
+  AuthenticatedSrcRoutesAuthenticatedQuotationsRouteImport.update({
+    id: '/src/routes/_authenticated/quotations',
+    path: '/src/routes/quotations',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedPurchasesRoute =
+  AuthenticatedSrcRoutesAuthenticatedPurchasesRouteImport.update({
+    id: '/src/routes/_authenticated/purchases',
+    path: '/src/routes/purchases',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedProductsRoute =
+  AuthenticatedSrcRoutesAuthenticatedProductsRouteImport.update({
+    id: '/src/routes/_authenticated/products',
+    path: '/src/routes/products',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedPosRoute =
+  AuthenticatedSrcRoutesAuthenticatedPosRouteImport.update({
+    id: '/src/routes/_authenticated/pos',
+    path: '/src/routes/pos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedNotificationsRoute =
+  AuthenticatedSrcRoutesAuthenticatedNotificationsRouteImport.update({
+    id: '/src/routes/_authenticated/notifications',
+    path: '/src/routes/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedInvoicesRoute =
+  AuthenticatedSrcRoutesAuthenticatedInvoicesRouteImport.update({
+    id: '/src/routes/_authenticated/invoices',
+    path: '/src/routes/invoices',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedExpensesRoute =
+  AuthenticatedSrcRoutesAuthenticatedExpensesRouteImport.update({
+    id: '/src/routes/_authenticated/expenses',
+    path: '/src/routes/expenses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedCustomersRoute =
+  AuthenticatedSrcRoutesAuthenticatedCustomersRouteImport.update({
+    id: '/src/routes/_authenticated/customers',
+    path: '/src/routes/customers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedCompaniesRoute =
+  AuthenticatedSrcRoutesAuthenticatedCompaniesRouteImport.update({
+    id: '/src/routes/_authenticated/companies',
+    path: '/src/routes/companies',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedAuditRoute =
+  AuthenticatedSrcRoutesAuthenticatedAuditRouteImport.update({
+    id: '/src/routes/_authenticated/audit',
+    path: '/src/routes/audit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSrcRoutesAuthenticatedAccountingRoute =
+  AuthenticatedSrcRoutesAuthenticatedAccountingRouteImport.update({
+    id: '/src/routes/_authenticated/accounting',
+    path: '/src/routes/accounting',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/src/routes/accounting': typeof AuthenticatedSrcRoutesAuthenticatedAccountingRoute
+  '/src/routes/audit': typeof AuthenticatedSrcRoutesAuthenticatedAuditRoute
+  '/src/routes/companies': typeof AuthenticatedSrcRoutesAuthenticatedCompaniesRoute
+  '/src/routes/customers': typeof AuthenticatedSrcRoutesAuthenticatedCustomersRoute
+  '/src/routes/expenses': typeof AuthenticatedSrcRoutesAuthenticatedExpensesRoute
+  '/src/routes/invoices': typeof AuthenticatedSrcRoutesAuthenticatedInvoicesRoute
+  '/src/routes/notifications': typeof AuthenticatedSrcRoutesAuthenticatedNotificationsRoute
+  '/src/routes/pos': typeof AuthenticatedSrcRoutesAuthenticatedPosRoute
+  '/src/routes/products': typeof AuthenticatedSrcRoutesAuthenticatedProductsRoute
+  '/src/routes/purchases': typeof AuthenticatedSrcRoutesAuthenticatedPurchasesRoute
+  '/src/routes/quotations': typeof AuthenticatedSrcRoutesAuthenticatedQuotationsRoute
+  '/src/routes/reports': typeof AuthenticatedSrcRoutesAuthenticatedReportsRoute
+  '/src/routes/sales': typeof AuthenticatedSrcRoutesAuthenticatedSalesRoute
+  '/src/routes/settings': typeof AuthenticatedSrcRoutesAuthenticatedSettingsRoute
+  '/src/routes/stock': typeof AuthenticatedSrcRoutesAuthenticatedStockRoute
+  '/src/routes/suppliers': typeof AuthenticatedSrcRoutesAuthenticatedSuppliersRoute
+  '/src/routes/team': typeof AuthenticatedSrcRoutesAuthenticatedTeamRoute
+  '/src/routes/warehouses': typeof AuthenticatedSrcRoutesAuthenticatedWarehousesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/src/routes/accounting': typeof AuthenticatedSrcRoutesAuthenticatedAccountingRoute
+  '/src/routes/audit': typeof AuthenticatedSrcRoutesAuthenticatedAuditRoute
+  '/src/routes/companies': typeof AuthenticatedSrcRoutesAuthenticatedCompaniesRoute
+  '/src/routes/customers': typeof AuthenticatedSrcRoutesAuthenticatedCustomersRoute
+  '/src/routes/expenses': typeof AuthenticatedSrcRoutesAuthenticatedExpensesRoute
+  '/src/routes/invoices': typeof AuthenticatedSrcRoutesAuthenticatedInvoicesRoute
+  '/src/routes/notifications': typeof AuthenticatedSrcRoutesAuthenticatedNotificationsRoute
+  '/src/routes/pos': typeof AuthenticatedSrcRoutesAuthenticatedPosRoute
+  '/src/routes/products': typeof AuthenticatedSrcRoutesAuthenticatedProductsRoute
+  '/src/routes/purchases': typeof AuthenticatedSrcRoutesAuthenticatedPurchasesRoute
+  '/src/routes/quotations': typeof AuthenticatedSrcRoutesAuthenticatedQuotationsRoute
+  '/src/routes/reports': typeof AuthenticatedSrcRoutesAuthenticatedReportsRoute
+  '/src/routes/sales': typeof AuthenticatedSrcRoutesAuthenticatedSalesRoute
+  '/src/routes/settings': typeof AuthenticatedSrcRoutesAuthenticatedSettingsRoute
+  '/src/routes/stock': typeof AuthenticatedSrcRoutesAuthenticatedStockRoute
+  '/src/routes/suppliers': typeof AuthenticatedSrcRoutesAuthenticatedSuppliersRoute
+  '/src/routes/team': typeof AuthenticatedSrcRoutesAuthenticatedTeamRoute
+  '/src/routes/warehouses': typeof AuthenticatedSrcRoutesAuthenticatedWarehousesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -50,18 +212,96 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/src/routes/_authenticated/accounting': typeof AuthenticatedSrcRoutesAuthenticatedAccountingRoute
+  '/_authenticated/src/routes/_authenticated/audit': typeof AuthenticatedSrcRoutesAuthenticatedAuditRoute
+  '/_authenticated/src/routes/_authenticated/companies': typeof AuthenticatedSrcRoutesAuthenticatedCompaniesRoute
+  '/_authenticated/src/routes/_authenticated/customers': typeof AuthenticatedSrcRoutesAuthenticatedCustomersRoute
+  '/_authenticated/src/routes/_authenticated/expenses': typeof AuthenticatedSrcRoutesAuthenticatedExpensesRoute
+  '/_authenticated/src/routes/_authenticated/invoices': typeof AuthenticatedSrcRoutesAuthenticatedInvoicesRoute
+  '/_authenticated/src/routes/_authenticated/notifications': typeof AuthenticatedSrcRoutesAuthenticatedNotificationsRoute
+  '/_authenticated/src/routes/_authenticated/pos': typeof AuthenticatedSrcRoutesAuthenticatedPosRoute
+  '/_authenticated/src/routes/_authenticated/products': typeof AuthenticatedSrcRoutesAuthenticatedProductsRoute
+  '/_authenticated/src/routes/_authenticated/purchases': typeof AuthenticatedSrcRoutesAuthenticatedPurchasesRoute
+  '/_authenticated/src/routes/_authenticated/quotations': typeof AuthenticatedSrcRoutesAuthenticatedQuotationsRoute
+  '/_authenticated/src/routes/_authenticated/reports': typeof AuthenticatedSrcRoutesAuthenticatedReportsRoute
+  '/_authenticated/src/routes/_authenticated/sales': typeof AuthenticatedSrcRoutesAuthenticatedSalesRoute
+  '/_authenticated/src/routes/_authenticated/settings': typeof AuthenticatedSrcRoutesAuthenticatedSettingsRoute
+  '/_authenticated/src/routes/_authenticated/stock': typeof AuthenticatedSrcRoutesAuthenticatedStockRoute
+  '/_authenticated/src/routes/_authenticated/suppliers': typeof AuthenticatedSrcRoutesAuthenticatedSuppliersRoute
+  '/_authenticated/src/routes/_authenticated/team': typeof AuthenticatedSrcRoutesAuthenticatedTeamRoute
+  '/_authenticated/src/routes/_authenticated/warehouses': typeof AuthenticatedSrcRoutesAuthenticatedWarehousesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/src/routes/accounting'
+    | '/src/routes/audit'
+    | '/src/routes/companies'
+    | '/src/routes/customers'
+    | '/src/routes/expenses'
+    | '/src/routes/invoices'
+    | '/src/routes/notifications'
+    | '/src/routes/pos'
+    | '/src/routes/products'
+    | '/src/routes/purchases'
+    | '/src/routes/quotations'
+    | '/src/routes/reports'
+    | '/src/routes/sales'
+    | '/src/routes/settings'
+    | '/src/routes/stock'
+    | '/src/routes/suppliers'
+    | '/src/routes/team'
+    | '/src/routes/warehouses'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/src/routes/accounting'
+    | '/src/routes/audit'
+    | '/src/routes/companies'
+    | '/src/routes/customers'
+    | '/src/routes/expenses'
+    | '/src/routes/invoices'
+    | '/src/routes/notifications'
+    | '/src/routes/pos'
+    | '/src/routes/products'
+    | '/src/routes/purchases'
+    | '/src/routes/quotations'
+    | '/src/routes/reports'
+    | '/src/routes/sales'
+    | '/src/routes/settings'
+    | '/src/routes/stock'
+    | '/src/routes/suppliers'
+    | '/src/routes/team'
+    | '/src/routes/warehouses'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/src/routes/_authenticated/accounting'
+    | '/_authenticated/src/routes/_authenticated/audit'
+    | '/_authenticated/src/routes/_authenticated/companies'
+    | '/_authenticated/src/routes/_authenticated/customers'
+    | '/_authenticated/src/routes/_authenticated/expenses'
+    | '/_authenticated/src/routes/_authenticated/invoices'
+    | '/_authenticated/src/routes/_authenticated/notifications'
+    | '/_authenticated/src/routes/_authenticated/pos'
+    | '/_authenticated/src/routes/_authenticated/products'
+    | '/_authenticated/src/routes/_authenticated/purchases'
+    | '/_authenticated/src/routes/_authenticated/quotations'
+    | '/_authenticated/src/routes/_authenticated/reports'
+    | '/_authenticated/src/routes/_authenticated/sales'
+    | '/_authenticated/src/routes/_authenticated/settings'
+    | '/_authenticated/src/routes/_authenticated/stock'
+    | '/_authenticated/src/routes/_authenticated/suppliers'
+    | '/_authenticated/src/routes/_authenticated/team'
+    | '/_authenticated/src/routes/_authenticated/warehouses'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,15 +340,195 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/src/routes/_authenticated/warehouses': {
+      id: '/_authenticated/src/routes/_authenticated/warehouses'
+      path: '/src/routes/warehouses'
+      fullPath: '/src/routes/warehouses'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedWarehousesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/team': {
+      id: '/_authenticated/src/routes/_authenticated/team'
+      path: '/src/routes/team'
+      fullPath: '/src/routes/team'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedTeamRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/suppliers': {
+      id: '/_authenticated/src/routes/_authenticated/suppliers'
+      path: '/src/routes/suppliers'
+      fullPath: '/src/routes/suppliers'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedSuppliersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/stock': {
+      id: '/_authenticated/src/routes/_authenticated/stock'
+      path: '/src/routes/stock'
+      fullPath: '/src/routes/stock'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedStockRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/settings': {
+      id: '/_authenticated/src/routes/_authenticated/settings'
+      path: '/src/routes/settings'
+      fullPath: '/src/routes/settings'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/sales': {
+      id: '/_authenticated/src/routes/_authenticated/sales'
+      path: '/src/routes/sales'
+      fullPath: '/src/routes/sales'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedSalesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/reports': {
+      id: '/_authenticated/src/routes/_authenticated/reports'
+      path: '/src/routes/reports'
+      fullPath: '/src/routes/reports'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/quotations': {
+      id: '/_authenticated/src/routes/_authenticated/quotations'
+      path: '/src/routes/quotations'
+      fullPath: '/src/routes/quotations'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedQuotationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/purchases': {
+      id: '/_authenticated/src/routes/_authenticated/purchases'
+      path: '/src/routes/purchases'
+      fullPath: '/src/routes/purchases'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedPurchasesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/products': {
+      id: '/_authenticated/src/routes/_authenticated/products'
+      path: '/src/routes/products'
+      fullPath: '/src/routes/products'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedProductsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/pos': {
+      id: '/_authenticated/src/routes/_authenticated/pos'
+      path: '/src/routes/pos'
+      fullPath: '/src/routes/pos'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedPosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/notifications': {
+      id: '/_authenticated/src/routes/_authenticated/notifications'
+      path: '/src/routes/notifications'
+      fullPath: '/src/routes/notifications'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/invoices': {
+      id: '/_authenticated/src/routes/_authenticated/invoices'
+      path: '/src/routes/invoices'
+      fullPath: '/src/routes/invoices'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedInvoicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/expenses': {
+      id: '/_authenticated/src/routes/_authenticated/expenses'
+      path: '/src/routes/expenses'
+      fullPath: '/src/routes/expenses'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedExpensesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/customers': {
+      id: '/_authenticated/src/routes/_authenticated/customers'
+      path: '/src/routes/customers'
+      fullPath: '/src/routes/customers'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedCustomersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/companies': {
+      id: '/_authenticated/src/routes/_authenticated/companies'
+      path: '/src/routes/companies'
+      fullPath: '/src/routes/companies'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/audit': {
+      id: '/_authenticated/src/routes/_authenticated/audit'
+      path: '/src/routes/audit'
+      fullPath: '/src/routes/audit'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/src/routes/_authenticated/accounting': {
+      id: '/_authenticated/src/routes/_authenticated/accounting'
+      path: '/src/routes/accounting'
+      fullPath: '/src/routes/accounting'
+      preLoaderRoute: typeof AuthenticatedSrcRoutesAuthenticatedAccountingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSrcRoutesAuthenticatedAccountingRoute: typeof AuthenticatedSrcRoutesAuthenticatedAccountingRoute
+  AuthenticatedSrcRoutesAuthenticatedAuditRoute: typeof AuthenticatedSrcRoutesAuthenticatedAuditRoute
+  AuthenticatedSrcRoutesAuthenticatedCompaniesRoute: typeof AuthenticatedSrcRoutesAuthenticatedCompaniesRoute
+  AuthenticatedSrcRoutesAuthenticatedCustomersRoute: typeof AuthenticatedSrcRoutesAuthenticatedCustomersRoute
+  AuthenticatedSrcRoutesAuthenticatedExpensesRoute: typeof AuthenticatedSrcRoutesAuthenticatedExpensesRoute
+  AuthenticatedSrcRoutesAuthenticatedInvoicesRoute: typeof AuthenticatedSrcRoutesAuthenticatedInvoicesRoute
+  AuthenticatedSrcRoutesAuthenticatedNotificationsRoute: typeof AuthenticatedSrcRoutesAuthenticatedNotificationsRoute
+  AuthenticatedSrcRoutesAuthenticatedPosRoute: typeof AuthenticatedSrcRoutesAuthenticatedPosRoute
+  AuthenticatedSrcRoutesAuthenticatedProductsRoute: typeof AuthenticatedSrcRoutesAuthenticatedProductsRoute
+  AuthenticatedSrcRoutesAuthenticatedPurchasesRoute: typeof AuthenticatedSrcRoutesAuthenticatedPurchasesRoute
+  AuthenticatedSrcRoutesAuthenticatedQuotationsRoute: typeof AuthenticatedSrcRoutesAuthenticatedQuotationsRoute
+  AuthenticatedSrcRoutesAuthenticatedReportsRoute: typeof AuthenticatedSrcRoutesAuthenticatedReportsRoute
+  AuthenticatedSrcRoutesAuthenticatedSalesRoute: typeof AuthenticatedSrcRoutesAuthenticatedSalesRoute
+  AuthenticatedSrcRoutesAuthenticatedSettingsRoute: typeof AuthenticatedSrcRoutesAuthenticatedSettingsRoute
+  AuthenticatedSrcRoutesAuthenticatedStockRoute: typeof AuthenticatedSrcRoutesAuthenticatedStockRoute
+  AuthenticatedSrcRoutesAuthenticatedSuppliersRoute: typeof AuthenticatedSrcRoutesAuthenticatedSuppliersRoute
+  AuthenticatedSrcRoutesAuthenticatedTeamRoute: typeof AuthenticatedSrcRoutesAuthenticatedTeamRoute
+  AuthenticatedSrcRoutesAuthenticatedWarehousesRoute: typeof AuthenticatedSrcRoutesAuthenticatedWarehousesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSrcRoutesAuthenticatedAccountingRoute:
+    AuthenticatedSrcRoutesAuthenticatedAccountingRoute,
+  AuthenticatedSrcRoutesAuthenticatedAuditRoute:
+    AuthenticatedSrcRoutesAuthenticatedAuditRoute,
+  AuthenticatedSrcRoutesAuthenticatedCompaniesRoute:
+    AuthenticatedSrcRoutesAuthenticatedCompaniesRoute,
+  AuthenticatedSrcRoutesAuthenticatedCustomersRoute:
+    AuthenticatedSrcRoutesAuthenticatedCustomersRoute,
+  AuthenticatedSrcRoutesAuthenticatedExpensesRoute:
+    AuthenticatedSrcRoutesAuthenticatedExpensesRoute,
+  AuthenticatedSrcRoutesAuthenticatedInvoicesRoute:
+    AuthenticatedSrcRoutesAuthenticatedInvoicesRoute,
+  AuthenticatedSrcRoutesAuthenticatedNotificationsRoute:
+    AuthenticatedSrcRoutesAuthenticatedNotificationsRoute,
+  AuthenticatedSrcRoutesAuthenticatedPosRoute:
+    AuthenticatedSrcRoutesAuthenticatedPosRoute,
+  AuthenticatedSrcRoutesAuthenticatedProductsRoute:
+    AuthenticatedSrcRoutesAuthenticatedProductsRoute,
+  AuthenticatedSrcRoutesAuthenticatedPurchasesRoute:
+    AuthenticatedSrcRoutesAuthenticatedPurchasesRoute,
+  AuthenticatedSrcRoutesAuthenticatedQuotationsRoute:
+    AuthenticatedSrcRoutesAuthenticatedQuotationsRoute,
+  AuthenticatedSrcRoutesAuthenticatedReportsRoute:
+    AuthenticatedSrcRoutesAuthenticatedReportsRoute,
+  AuthenticatedSrcRoutesAuthenticatedSalesRoute:
+    AuthenticatedSrcRoutesAuthenticatedSalesRoute,
+  AuthenticatedSrcRoutesAuthenticatedSettingsRoute:
+    AuthenticatedSrcRoutesAuthenticatedSettingsRoute,
+  AuthenticatedSrcRoutesAuthenticatedStockRoute:
+    AuthenticatedSrcRoutesAuthenticatedStockRoute,
+  AuthenticatedSrcRoutesAuthenticatedSuppliersRoute:
+    AuthenticatedSrcRoutesAuthenticatedSuppliersRoute,
+  AuthenticatedSrcRoutesAuthenticatedTeamRoute:
+    AuthenticatedSrcRoutesAuthenticatedTeamRoute,
+  AuthenticatedSrcRoutesAuthenticatedWarehousesRoute:
+    AuthenticatedSrcRoutesAuthenticatedWarehousesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

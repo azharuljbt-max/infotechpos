@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { ShoppingCart } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/pos")({
+export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/pos")({
   component: () => (
     <PlaceholderPage
       title="POS"

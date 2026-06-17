@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { Bell } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/notifications")({
+export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/notifications")({
   component: () => (
     <PlaceholderPage
       title="Notifications"

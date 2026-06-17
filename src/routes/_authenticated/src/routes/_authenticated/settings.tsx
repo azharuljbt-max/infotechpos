@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { Settings } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/settings")({
+export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/settings")({
   component: () => (
     <PlaceholderPage
       title="Settings"

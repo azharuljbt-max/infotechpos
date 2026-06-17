@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { BarChart3 } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/reports")({
+export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/reports")({
   component: () => (
     <PlaceholderPage
       title="Reports"

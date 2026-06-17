@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PlaceholderPage } from "@/components/placeholder-page";
 import { FileSignature } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/quotations")({
+export const Route = createFileRoute("/_authenticated/src/routes/_authenticated/quotations")({
   component: () => (
     <PlaceholderPage
       title="Quotations"
