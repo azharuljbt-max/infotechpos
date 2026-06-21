@@ -17,10 +17,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const kpis = [
-  { label: "Today's Sales", value: "৳ 1,28,400", delta: "+12.4%", up: true, icon: ShoppingCart, hint: "vs yesterday" },
-  { label: "Today's Purchase", value: "৳ 64,200", delta: "+3.1%", up: true, icon: Receipt, hint: "vs yesterday" },
-  { label: "Today's Expense", value: "৳ 18,750", delta: "-5.2%", up: false, icon: Wallet, hint: "vs yesterday" },
-  { label: "Today's Profit", value: "৳ 45,450", delta: "+22.8%", up: true, icon: TrendingUp, hint: "net margin 35%" },
+  { label: "Today's Sales", value: "৳ 1,28,400", delta: "+12.4%", up: true, icon: ShoppingCart, hint: "vs yesterday", tint: "bg-chart-1/15 text-chart-1 ring-chart-1/20" },
+  { label: "Today's Purchase", value: "৳ 64,200", delta: "+3.1%", up: true, icon: Receipt, hint: "vs yesterday", tint: "bg-chart-2/15 text-chart-2 ring-chart-2/20" },
+  { label: "Today's Expense", value: "৳ 18,750", delta: "-5.2%", up: false, icon: Wallet, hint: "vs yesterday", tint: "bg-chart-4/15 text-chart-4 ring-chart-4/20" },
+  { label: "Today's Profit", value: "৳ 45,450", delta: "+22.8%", up: true, icon: TrendingUp, hint: "net margin 35%", tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
 ];
 
 const monthly = [
