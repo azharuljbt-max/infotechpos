@@ -26,6 +26,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { useCurrency } from "@/lib/currency";
 
 export const Route = createFileRoute("/_authenticated/products")({
   component: ProductsPage,
