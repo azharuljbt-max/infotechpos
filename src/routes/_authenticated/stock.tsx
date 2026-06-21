@@ -29,6 +29,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency";
 
 export const Route = createFileRoute("/_authenticated/stock")({
   component: StockPage,
@@ -49,6 +50,7 @@ type MoveType = "in" | "out" | "adjustment";
 
 function StockPage() {
   const qc = useQueryClient();
+  const { symbol: sym } = useCurrency();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [moveType, setMoveType] = useState<MoveType>("in");
@@ -159,8 +161,8 @@ function StockPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5">
         <StatCard tint="bg-chart-1/15 text-chart-1 ring-chart-1/20" icon={Boxes} label="Total Units" value={stats.totalUnits.toLocaleString()} />
-        <StatCard tint="bg-chart-2/15 text-chart-2 ring-chart-2/20" icon={Package} label="Stock Value" value={`$${stats.stockValue.toFixed(0)}`} />
-        <StatCard tint="bg-chart-3/15 text-chart-3 ring-chart-3/20" icon={Package} label="Retail Value" value={`$${stats.retailValue.toFixed(0)}`} />
+        <StatCard tint="bg-chart-2/15 text-chart-2 ring-chart-2/20" icon={Package} label="Stock Value" value={`${sym}${stats.stockValue.toFixed(0)}`} />
+        <StatCard tint="bg-chart-3/15 text-chart-3 ring-chart-3/20" icon={Package} label="Retail Value" value={`${sym}${stats.retailValue.toFixed(0)}`} />
         <StatCard tint="bg-chart-4/15 text-chart-4 ring-chart-4/20" icon={AlertTriangle} label="Low Stock" value={String(stats.lowCount)} />
         <StatCard tint="bg-destructive/15 text-destructive ring-destructive/20" icon={AlertTriangle} label="Out of Stock" value={String(stats.outCount)} />
       </div>
@@ -217,7 +219,7 @@ function StockPage() {
                             </span>
                           </TableCell>
                           <TableCell className="text-right text-muted-foreground">{p.reorder_level}</TableCell>
-                          <TableCell className="text-right">${(Number(p.stock) * Number(p.cost)).toFixed(2)}</TableCell>
+                          <TableCell className="text-right">{sym}{(Number(p.stock) * Number(p.cost)).toFixed(2)}</TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
                               <Button size="icon" variant="ghost" className="h-7 w-7" title="Stock In" onClick={() => openFor(p, "in")}>
