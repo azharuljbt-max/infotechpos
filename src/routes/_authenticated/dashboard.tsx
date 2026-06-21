@@ -17,10 +17,10 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const kpis = [
-  { label: "Today's Sales", value: "৳ 1,28,400", delta: "+12.4%", up: true, icon: ShoppingCart, hint: "vs yesterday" },
-  { label: "Today's Purchase", value: "৳ 64,200", delta: "+3.1%", up: true, icon: Receipt, hint: "vs yesterday" },
-  { label: "Today's Expense", value: "৳ 18,750", delta: "-5.2%", up: false, icon: Wallet, hint: "vs yesterday" },
-  { label: "Today's Profit", value: "৳ 45,450", delta: "+22.8%", up: true, icon: TrendingUp, hint: "net margin 35%" },
+  { label: "Today's Sales", value: "৳ 1,28,400", delta: "+12.4%", up: true, icon: ShoppingCart, hint: "vs yesterday", tint: "bg-chart-1/15 text-chart-1 ring-chart-1/20" },
+  { label: "Today's Purchase", value: "৳ 64,200", delta: "+3.1%", up: true, icon: Receipt, hint: "vs yesterday", tint: "bg-chart-2/15 text-chart-2 ring-chart-2/20" },
+  { label: "Today's Expense", value: "৳ 18,750", delta: "-5.2%", up: false, icon: Wallet, hint: "vs yesterday", tint: "bg-chart-4/15 text-chart-4 ring-chart-4/20" },
+  { label: "Today's Profit", value: "৳ 45,450", delta: "+22.8%", up: true, icon: TrendingUp, hint: "net margin 35%", tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
 ];
 
 const monthly = [
@@ -79,16 +79,18 @@ function DashboardPage() {
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
-            <Card key={k.label} className="p-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">{k.label}</span>
-                <div className="grid h-7 w-7 place-items-center rounded-md bg-muted text-muted-foreground">
-                  <Icon className="h-3.5 w-3.5" />
+            <Card key={k.label} className="p-4 transition hover:shadow-md">
+              <div className="flex items-center gap-3">
+                <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ring-1 ${k.tint}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-xs text-muted-foreground">{k.label}</div>
+                  <div className="text-xl font-semibold tracking-tight">{k.value}</div>
                 </div>
               </div>
-              <div className="mt-2 text-2xl font-semibold tracking-tight">{k.value}</div>
-              <div className="mt-2 flex items-center gap-2 text-xs">
-                <span className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+              <div className="mt-3 flex items-center gap-2 text-xs">
+                <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
                   {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                   {k.delta}
                 </span>
