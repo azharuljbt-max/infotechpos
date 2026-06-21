@@ -73,6 +73,7 @@ const emptyForm: ProductForm = {
 
 function ProductsPage() {
   const qc = useQueryClient();
+  const { fmt } = useCurrency();
   const [query, setQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -198,8 +199,7 @@ function ProductsPage() {
     upsert.mutate(parsed.data);
   };
 
-  const fmt = (n: number) =>
-    new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(n);
+
 
   return (
     <>
