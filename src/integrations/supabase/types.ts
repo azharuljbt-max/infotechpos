@@ -71,6 +71,110 @@ export type Database = {
         }
         Relationships: []
       }
+      purchase_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string | null
+          product_name: string
+          purchase_id: string
+          quantity: number
+          sku: string | null
+          total: number
+          unit_cost: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name: string
+          purchase_id: string
+          quantity?: number
+          sku?: string | null
+          total?: number
+          unit_cost?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          purchase_id?: string
+          quantity?: number
+          sku?: string | null
+          total?: number
+          unit_cost?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchase_items_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "purchases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      purchases: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          discount: number
+          id: string
+          invoice_no: string
+          notes: string | null
+          payment_method: string
+          purchase_date: string
+          status: string
+          subtotal: number
+          supplier_name: string | null
+          tax: number
+          total: number
+          updated_at: string
+          user_id: string
+          warehouse_id: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          discount?: number
+          id?: string
+          invoice_no: string
+          notes?: string | null
+          payment_method?: string
+          purchase_date?: string
+          status?: string
+          subtotal?: number
+          supplier_name?: string | null
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+          warehouse_id?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          discount?: number
+          id?: string
+          invoice_no?: string
+          notes?: string | null
+          payment_method?: string
+          purchase_date?: string
+          status?: string
+          subtotal?: number
+          supplier_name?: string | null
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+          warehouse_id?: string | null
+        }
+        Relationships: []
+      }
       sale_items: {
         Row: {
           created_at: string
@@ -257,6 +361,48 @@ export type Database = {
           enabled_units?: string[]
           language?: string
           tax_rate?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      warehouses: {
+        Row: {
+          address: string | null
+          code: string | null
+          created_at: string
+          id: string
+          is_default: boolean
+          manager: string | null
+          name: string
+          phone: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          manager?: string | null
+          name: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          code?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          manager?: string | null
+          name?: string
+          phone?: string | null
+          status?: string
           updated_at?: string
           user_id?: string
         }
