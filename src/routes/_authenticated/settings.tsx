@@ -155,7 +155,7 @@ function SettingsPage() {
   if (isLoading || !form) {
     return (
       <>
-        <PageHeader title="Settings" description="Loading…" icon={<SettingsIcon className="h-5 w-5" />} />
+        <PageHeader title="Settings" description="Loading…" />
         <Card className="p-12 text-center text-sm text-muted-foreground">Loading your settings…</Card>
       </>
     );
