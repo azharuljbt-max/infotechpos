@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          address: string | null
+          created_at: string
+          currency: string
+          email: string | null
+          id: string
+          industry: string | null
+          is_default: boolean
+          legal_name: string | null
+          logo_url: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          plan: string
+          status: string
+          tax_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          id?: string
+          industry?: string | null
+          is_default?: boolean
+          legal_name?: string | null
+          logo_url?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          plan?: string
+          status?: string
+          tax_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          currency?: string
+          email?: string | null
+          id?: string
+          industry?: string | null
+          is_default?: boolean
+          legal_name?: string | null
+          logo_url?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          plan?: string
+          status?: string
+          tax_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address: string | null
