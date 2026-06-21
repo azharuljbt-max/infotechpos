@@ -20,6 +20,7 @@ export function AppShell() {
   const { theme, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const qc = useQueryClient();
+  const t = useT();
 
   const { data: settings } = useQuery({
     queryKey: ["user-settings"],
