@@ -179,6 +179,50 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_movements: {
+        Row: {
+          balance_after: number | null
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          reason: string | null
+          reference: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity?: number
+          reason?: string | null
+          reference?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          reason?: string | null
+          reference?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
