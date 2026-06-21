@@ -18,11 +18,37 @@ export function AppShell() {
   const navigate = useNavigate();
   const { theme, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const qc = useQueryClient();
+
+  const { data: settings } = useQuery({
+    queryKey: ["user-settings"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return null;
+      const { data } = await supabase.from("user_settings").select("*").eq("user_id", u.user.id).maybeSingle();
+      return data;
+    },
+  });
+
+  const lang = (settings?.language as "en" | "bn") ?? "en";
+
+  const toggleLang = useMutation({
+    mutationFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) throw new Error("Not signed in");
+      const next = lang === "en" ? "bn" : "en";
+      const { error } = await supabase.from("user_settings").update({ language: next }).eq("user_id", u.user.id);
+      if (error) throw error;
+      return next;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["user-settings"] }),
+  });
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   };
+
 
   return (
     <div className="flex min-h-screen w-full bg-background text-foreground">
