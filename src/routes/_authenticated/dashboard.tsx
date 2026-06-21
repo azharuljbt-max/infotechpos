@@ -61,6 +61,33 @@ const recentOrders = [
 ];
 
 function DashboardPage() {
+  const { symbol: sym } = useCurrency();
+  const fmtMoney = (n: number) => `${sym} ${n.toLocaleString()}`;
+  const kpis = [
+    { label: "Today's Sales", value: fmtMoney(128400), delta: "+12.4%", up: true, icon: ShoppingCart, hint: "vs yesterday", tint: "bg-chart-1/15 text-chart-1 ring-chart-1/20" },
+    { label: "Today's Purchase", value: fmtMoney(64200), delta: "+3.1%", up: true, icon: Receipt, hint: "vs yesterday", tint: "bg-chart-2/15 text-chart-2 ring-chart-2/20" },
+    { label: "Today's Expense", value: fmtMoney(18750), delta: "-5.2%", up: false, icon: Wallet, hint: "vs yesterday", tint: "bg-chart-4/15 text-chart-4 ring-chart-4/20" },
+    { label: "Today's Profit", value: fmtMoney(45450), delta: "+22.8%", up: true, icon: TrendingUp, hint: "net margin 35%", tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
+  ];
+  const topProducts = [
+    { name: "iPhone 15 Pro 256GB", sold: 142, revenue: fmtMoney(19880000) },
+    { name: "Samsung Galaxy S24", sold: 98, revenue: fmtMoney(10780000) },
+    { name: "MacBook Air M3", sold: 56, revenue: fmtMoney(7840000) },
+    { name: "AirPods Pro 2", sold: 312, revenue: fmtMoney(9360000) },
+    { name: "iPad Air", sold: 74, revenue: fmtMoney(5180000) },
+  ];
+  const lowStock = [
+    { name: "USB-C Cable 2m", sku: "CBL-USC-002", stock: 4, reorder: 20 },
+    { name: "Logitech MX Master 3S", sku: "MOU-LGT-3S", stock: 2, reorder: 10 },
+    { name: "Anker 65W Charger", sku: "CHG-ANK-65W", stock: 6, reorder: 25 },
+  ];
+  const recentOrders = [
+    { id: "INV-10284", customer: "Rahim Trading", amount: fmtMoney(24500), status: "Paid" },
+    { id: "INV-10283", customer: "Karim Electronics", amount: fmtMoney(87200), status: "Pending" },
+    { id: "INV-10282", customer: "Walk-in", amount: fmtMoney(3150), status: "Paid" },
+    { id: "INV-10281", customer: "Hossain & Sons", amount: fmtMoney(142000), status: "Partial" },
+    { id: "INV-10280", customer: "Walk-in", amount: fmtMoney(8900), status: "Paid" },
+  ];
   return (
     <>
       <PageHeader
