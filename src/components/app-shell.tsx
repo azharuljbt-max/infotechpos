@@ -94,7 +94,7 @@ export function AppShell() {
                         )}
                       >
                         <Icon className={cn("h-4 w-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
-                        <span>{item.label}</span>
+                        <span>{t(item.label)}</span>
                       </Link>
                     </li>
                   );
