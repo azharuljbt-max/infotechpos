@@ -126,7 +126,7 @@ export function AppShell() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input
-              placeholder="Search products, invoices, customers…"
+              placeholder={t("Search products, invoices, customers…")}
               className="h-9 w-full rounded-md border border-input bg-muted/40 pl-8 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-ring focus:bg-background"
             />
             <kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 select-none rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground sm:inline-block">
