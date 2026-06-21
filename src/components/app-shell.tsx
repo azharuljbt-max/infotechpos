@@ -1,4 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
+import logo from "@/assets/logo.png";
 import { useState, type ReactNode } from "react";
 import { Search, Moon, Sun, Bell, ChevronDown, LogOut, Menu, X, Building2 } from "lucide-react";
 import { NAV } from "@/lib/nav";
@@ -33,7 +34,7 @@ export function AppShell() {
       >
         <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
           <Link to="/dashboard" className="flex items-center gap-2 font-semibold tracking-tight">
-            <div className="grid h-7 w-7 place-items-center rounded-md bg-primary text-primary-foreground text-[11px] font-bold">N</div>
+            <img src={logo} alt="Nexus ERP" className="h-7 w-7 rounded-md object-contain" />
             <span>Nexus ERP</span>
           </Link>
           <button className="lg:hidden text-sidebar-foreground" onClick={() => setMobileOpen(false)}>

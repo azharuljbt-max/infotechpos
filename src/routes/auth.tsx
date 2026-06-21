@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -65,7 +66,7 @@ function AuthPage() {
       {/* Brand panel */}
       <div className="relative hidden lg:flex flex-col justify-between p-10 bg-sidebar border-r border-sidebar-border">
         <div className="flex items-center gap-2 font-semibold">
-          <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground text-sm font-bold">N</div>
+          <img src={logo} alt="Nexus ERP" className="h-8 w-8 rounded-md object-contain" />
           <span className="tracking-tight">Nexus ERP</span>
         </div>
         <div>
@@ -90,7 +91,7 @@ function AuthPage() {
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-6 flex items-center gap-2 font-semibold">
-            <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground text-sm font-bold">N</div>
+            <img src={logo} alt="Nexus ERP" className="h-8 w-8 rounded-md object-contain" />
             <span>Nexus ERP</span>
           </div>
           <h2 className="text-2xl font-semibold tracking-tight">
