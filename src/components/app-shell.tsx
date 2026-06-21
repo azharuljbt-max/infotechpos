@@ -136,6 +136,18 @@ export function AppShell() {
             <Button variant="ghost" size="icon" onClick={toggle} aria-label="Toggle theme">
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => toggleLang.mutate()}
+              disabled={toggleLang.isPending}
+              aria-label="Toggle language"
+              className="h-9 gap-1.5 px-2 font-semibold"
+              title={lang === "en" ? "Switch to Bangla" : "Switch to English"}
+            >
+              <Languages className="h-4 w-4" />
+              <span className="text-xs">{lang === "en" ? "EN" : "বাং"}</span>
+            </Button>
             <Button variant="ghost" size="icon" aria-label="Notifications" className="relative">
               <Bell className="h-4 w-4" />
               <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
