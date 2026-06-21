@@ -66,7 +66,7 @@ function AuthPage() {
       {/* Brand panel */}
       <div className="relative hidden lg:flex flex-col justify-between p-10 bg-sidebar border-r border-sidebar-border">
         <div className="flex items-center gap-2 font-semibold">
-          <div className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground text-sm font-bold">N</div>
+          <img src={logo} alt="Nexus ERP" className="h-8 w-8 rounded-md object-contain" />
           <span className="tracking-tight">Nexus ERP</span>
         </div>
         <div>
