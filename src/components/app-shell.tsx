@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { Search, Moon, Sun, Bell, ChevronDown, LogOut, Menu, X, Building2, Languages } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { NAV } from "@/lib/nav";
+import { useT } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ export function AppShell() {
   const { theme, toggle } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const qc = useQueryClient();
+  const t = useT();
 
   const { data: settings } = useQuery({
     queryKey: ["user-settings"],
@@ -73,7 +75,7 @@ export function AppShell() {
           {NAV.map((group) => (
             <div key={group.label} className="mb-4">
               <div className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {group.label}
+                {t(group.label)}
               </div>
               <ul className="space-y-0.5">
                 {group.items.map((item) => {
@@ -92,7 +94,7 @@ export function AppShell() {
                         )}
                       >
                         <Icon className={cn("h-4 w-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
-                        <span>{item.label}</span>
+                        <span>{t(item.label)}</span>
                       </Link>
                     </li>
                   );
@@ -107,7 +109,7 @@ export function AppShell() {
             <Building2 className="h-3.5 w-3.5 text-primary" />
             <div className="flex-1 truncate">
               <div className="font-medium">Acme Inc.</div>
-              <div className="text-[10px] text-muted-foreground">Trial · 14 days left</div>
+              <div className="text-[10px] text-muted-foreground">{t("Trial · 14 days left")}</div>
             </div>
           </div>
         </div>
@@ -124,7 +126,7 @@ export function AppShell() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <input
-              placeholder="Search products, invoices, customers…"
+              placeholder={t("Search products, invoices, customers…")}
               className="h-9 w-full rounded-md border border-input bg-muted/40 pl-8 pr-3 text-sm outline-none placeholder:text-muted-foreground focus:border-ring focus:bg-background"
             />
             <kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 select-none rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground sm:inline-block">
@@ -160,13 +162,13 @@ export function AppShell() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>My account</DropdownMenuLabel>
+                <DropdownMenuLabel>{t("My account")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Link to="/settings">Settings</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/team">Team & Roles</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/settings">{t("Settings")}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/team">{t("Team & Roles")}</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-3.5 w-3.5" /> Sign out
+                  <LogOut className="mr-2 h-3.5 w-3.5" /> {t("Sign out")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
