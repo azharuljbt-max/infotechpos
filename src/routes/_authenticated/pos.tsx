@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
   DialogHeader, DialogTitle,
@@ -49,6 +50,7 @@ type PayMethod = "cash" | "card" | "mobile";
 
 function POSPage() {
   const qc = useQueryClient();
+  const { symbol: sym } = useCurrency();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>("all");
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -316,7 +318,7 @@ function POSPage() {
                     </div>
                     <div className="line-clamp-2 text-sm font-medium leading-tight">{p.name}</div>
                     <div className="flex w-full items-center justify-between">
-                      <span className="text-sm font-semibold">${Number(p.price).toFixed(2)}</span>
+                      <span className="text-sm font-semibold">{sym}{Number(p.price).toFixed(2)}</span>
                       <Badge variant={p.stock <= 5 ? "destructive" : "secondary"} className="text-[10px]">
                         {p.stock} {p.unit}
                       </Badge>
@@ -365,7 +367,7 @@ function POSPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="truncate text-sm font-medium">{i.name}</div>
-                        <div className="text-xs text-muted-foreground">${i.price.toFixed(2)} each</div>
+                        <div className="text-xs text-muted-foreground">{sym}{i.price.toFixed(2)} each</div>
                       </div>
                       <button onClick={() => removeItem(i.product_id)} className="text-muted-foreground hover:text-destructive">
                         <Trash2 className="h-3.5 w-3.5" />
@@ -385,7 +387,7 @@ function POSPage() {
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      <div className="text-sm font-semibold">${(i.price * i.quantity).toFixed(2)}</div>
+                      <div className="text-sm font-semibold">{sym}{(i.price * i.quantity).toFixed(2)}</div>
                     </div>
                   </li>
                 ))}
@@ -405,15 +407,15 @@ function POSPage() {
               </div>
             </div>
             <div className="space-y-1 pt-1 text-xs">
-              <Row label="Subtotal" value={subtotal} />
-              <Row label="Discount" value={-discountAmt} />
-              <Row label={`Tax (${taxRate}%)`} value={taxAmt} />
+              <Row label="Subtotal" value={subtotal} sym={sym} />
+              <Row label="Discount" value={-discountAmt} sym={sym} />
+              <Row label={`Tax (${taxRate}%)`} value={taxAmt} sym={sym} />
               <div className="flex justify-between border-t border-border pt-2 text-base font-semibold">
-                <span>Total</span><span>${total.toFixed(2)}</span>
+                <span>Total</span><span>{sym}{total.toFixed(2)}</span>
               </div>
             </div>
             <Button className="w-full" size="lg" disabled={cart.length === 0} onClick={() => setPayOpen(true)}>
-              <Receipt className="mr-2 h-4 w-4" /> Charge ${total.toFixed(2)}
+              <Receipt className="mr-2 h-4 w-4" /> Charge {sym}{total.toFixed(2)}
             </Button>
           </div>
         </aside>
@@ -424,7 +426,7 @@ function POSPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Payment</DialogTitle>
-            <DialogDescription>Complete sale of ${total.toFixed(2)}</DialogDescription>
+            <DialogDescription>Complete sale of {sym}{total.toFixed(2)}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-2">
@@ -454,7 +456,7 @@ function POSPage() {
                 .filter((v, i, a) => a.indexOf(v) === i)
                 .map((v) => (
                   <Button key={v} variant="outline" size="sm" onClick={() => setAmountPaid(Number(v.toFixed(2)))}>
-                    ${v.toFixed(2)}
+                    {sym}{v.toFixed(2)}
                   </Button>
                 ))}
             </div>
@@ -464,7 +466,7 @@ function POSPage() {
             </div>
             <div className="flex items-center justify-between rounded-md bg-muted px-3 py-2 text-sm">
               <span>Change Due</span>
-              <span className="text-lg font-semibold">${change.toFixed(2)}</span>
+              <span className="text-lg font-semibold">{sym}{change.toFixed(2)}</span>
             </div>
           </div>
           <DialogFooter>
@@ -494,19 +496,19 @@ function POSPage() {
                 {receipt.items.map((i) => (
                   <div key={i.product_id} className="flex justify-between text-xs">
                     <span>{i.name} × {i.quantity}</span>
-                    <span>${(i.price * i.quantity).toFixed(2)}</span>
+                    <span>{sym}{(i.price * i.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="space-y-1 text-xs">
-                <Row label="Subtotal" value={receipt.subtotal} />
-                <Row label="Discount" value={-receipt.discount} />
-                <Row label="Tax" value={receipt.tax} />
+                <Row label="Subtotal" value={receipt.subtotal} sym={sym} />
+                <Row label="Discount" value={-receipt.discount} sym={sym} />
+                <Row label="Tax" value={receipt.tax} sym={sym} />
                 <div className="flex justify-between pt-1 text-base font-semibold">
-                  <span>Total</span><span>${receipt.total.toFixed(2)}</span>
+                  <span>Total</span><span>{sym}{receipt.total.toFixed(2)}</span>
                 </div>
-                <Row label={`Paid (${receipt.payment_method})`} value={receipt.amount_paid} />
-                <Row label="Change" value={receipt.change_due} />
+                <Row label={`Paid (${receipt.payment_method})`} value={receipt.amount_paid} sym={sym} />
+                <Row label="Change" value={receipt.change_due} sym={sym} />
               </div>
             </div>
           )}
@@ -522,11 +524,11 @@ function POSPage() {
   );
 }
 
-function Row({ label, value }: { label: string; value: number }) {
+function Row({ label, value, sym = "$" }: { label: string; value: number; sym?: string }) {
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <span>${value.toFixed(2)}</span>
+      <span>{sym}{value.toFixed(2)}</span>
     </div>
   );
 }
