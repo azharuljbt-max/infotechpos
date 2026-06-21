@@ -14,6 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
+      invoice_items: {
+        Row: {
+          created_at: string
+          id: string
+          invoice_id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          sku: string | null
+          total: number
+          unit_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invoice_id: string
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          sku?: string | null
+          total?: number
+          unit_price?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          sku?: string | null
+          total?: number
+          unit_price?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          customer_address: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          discount: number
+          due_date: string | null
+          id: string
+          invoice_no: string
+          issue_date: string
+          notes: string | null
+          status: string
+          subtotal: number
+          tax: number
+          total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          due_date?: string | null
+          id?: string
+          invoice_no: string
+          issue_date?: string
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          due_date?: string | null
+          id?: string
+          invoice_no?: string
+          issue_date?: string
+          notes?: string | null
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           barcode: string | null
@@ -172,6 +282,113 @@ export type Database = {
           updated_at?: string
           user_id?: string
           warehouse_id?: string | null
+        }
+        Relationships: []
+      }
+      quotation_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string | null
+          product_name: string
+          quantity: number
+          quotation_id: string
+          sku: string | null
+          total: number
+          unit_price: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name: string
+          quantity?: number
+          quotation_id: string
+          sku?: string | null
+          total?: number
+          unit_price?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          product_name?: string
+          quantity?: number
+          quotation_id?: string
+          sku?: string | null
+          total?: number
+          unit_price?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotation_items_quotation_id_fkey"
+            columns: ["quotation_id"]
+            isOneToOne: false
+            referencedRelation: "quotations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotations: {
+        Row: {
+          created_at: string
+          customer_address: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          discount: number
+          id: string
+          issue_date: string
+          notes: string | null
+          quotation_no: string
+          status: string
+          subtotal: number
+          tax: number
+          total: number
+          updated_at: string
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          quotation_no: string
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string | null
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          discount?: number
+          id?: string
+          issue_date?: string
+          notes?: string | null
+          quotation_no?: string
+          status?: string
+          subtotal?: number
+          tax?: number
+          total?: number
+          updated_at?: string
+          user_id?: string
+          valid_until?: string | null
         }
         Relationships: []
       }
