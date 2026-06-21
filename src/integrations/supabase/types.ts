@@ -223,6 +223,45 @@ export type Database = {
           },
         ]
       }
+      user_settings: {
+        Row: {
+          company_name: string
+          created_at: string
+          currency_code: string
+          currency_symbol: string
+          default_unit: string
+          enabled_units: string[]
+          language: string
+          tax_rate: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name?: string
+          created_at?: string
+          currency_code?: string
+          currency_symbol?: string
+          default_unit?: string
+          enabled_units?: string[]
+          language?: string
+          tax_rate?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          currency_code?: string
+          currency_symbol?: string
+          default_unit?: string
+          enabled_units?: string[]
+          language?: string
+          tax_rate?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
