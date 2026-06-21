@@ -109,7 +109,7 @@ export function AppShell() {
             <Building2 className="h-3.5 w-3.5 text-primary" />
             <div className="flex-1 truncate">
               <div className="font-medium">Acme Inc.</div>
-              <div className="text-[10px] text-muted-foreground">Trial · 14 days left</div>
+              <div className="text-[10px] text-muted-foreground">{t("Trial · 14 days left")}</div>
             </div>
           </div>
         </div>
