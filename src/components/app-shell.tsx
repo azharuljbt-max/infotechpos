@@ -162,13 +162,13 @@ export function AppShell() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>My account</DropdownMenuLabel>
+                <DropdownMenuLabel>{t("My account")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Link to="/settings">Settings</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/team">Team & Roles</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/settings">{t("Settings")}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/team">{t("Team & Roles")}</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
-                  <LogOut className="mr-2 h-3.5 w-3.5" /> Sign out
+                  <LogOut className="mr-2 h-3.5 w-3.5" /> {t("Sign out")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
