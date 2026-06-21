@@ -75,7 +75,7 @@ export function AppShell() {
           {NAV.map((group) => (
             <div key={group.label} className="mb-4">
               <div className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {group.label}
+                {t(group.label)}
               </div>
               <ul className="space-y-0.5">
                 {group.items.map((item) => {
