@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Search, Pencil, Trash2, Building2, Star, Globe, Phone, Mail, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Building2, Star, Globe, Phone, Mail, KeyRound, Eye, EyeOff, Check, X, ShieldCheck, AlertTriangle, Loader2 } from "lucide-react";
+import { evaluatePassword, PASSWORD_RULES } from "@/lib/password-strength";
+import { logAudit } from "@/lib/audit";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app-shell";
