@@ -59,7 +59,7 @@ const empty = {
   email: "", phone: "", address: "", tax_id: "", website: "",
   currency: "USD", logo_url: "",
   plan: "trial", status: "active",
-  trial_ends_at: "", is_default: false, notes: "",
+  trial_ends_at: "", is_default: false, default_user_id: "", notes: "",
   // Login access (only used when creating a new company)
   create_login: false,
   login_full_name: "",
