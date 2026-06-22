@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SuperAdminRouteImport } from './routes/super-admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperAdminLoginRouteImport } from './routes/super-admin.login'
 import { Route as AuthenticatedWarehousesRouteImport } from './routes/_authenticated/warehouses'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
@@ -33,6 +35,11 @@ import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAuditRouteImport } from './routes/_authenticated/audit'
 import { Route as AuthenticatedAccountingRouteImport } from './routes/_authenticated/accounting'
 
+const SuperAdminRoute = SuperAdminRouteImport.update({
+  id: '/super-admin',
+  path: '/super-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -46,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SuperAdminLoginRoute = SuperAdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => SuperAdminRoute,
 } as any)
 const AuthenticatedWarehousesRoute = AuthenticatedWarehousesRouteImport.update({
   id: '/warehouses',
@@ -152,6 +164,7 @@ const AuthenticatedAccountingRoute = AuthenticatedAccountingRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/super-admin': typeof SuperAdminRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/companies': typeof AuthenticatedCompaniesRoute
@@ -172,10 +185,12 @@ export interface FileRoutesByFullPath {
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/team': typeof AuthenticatedTeamRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
+  '/super-admin/login': typeof SuperAdminLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/super-admin': typeof SuperAdminRouteWithChildren
   '/accounting': typeof AuthenticatedAccountingRoute
   '/audit': typeof AuthenticatedAuditRoute
   '/companies': typeof AuthenticatedCompaniesRoute
@@ -196,12 +211,14 @@ export interface FileRoutesByTo {
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/team': typeof AuthenticatedTeamRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
+  '/super-admin/login': typeof SuperAdminLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/super-admin': typeof SuperAdminRouteWithChildren
   '/_authenticated/accounting': typeof AuthenticatedAccountingRoute
   '/_authenticated/audit': typeof AuthenticatedAuditRoute
   '/_authenticated/companies': typeof AuthenticatedCompaniesRoute
@@ -222,12 +239,14 @@ export interface FileRoutesById {
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/warehouses': typeof AuthenticatedWarehousesRoute
+  '/super-admin/login': typeof SuperAdminLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/super-admin'
     | '/accounting'
     | '/audit'
     | '/companies'
@@ -248,10 +267,12 @@ export interface FileRouteTypes {
     | '/suppliers'
     | '/team'
     | '/warehouses'
+    | '/super-admin/login'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/super-admin'
     | '/accounting'
     | '/audit'
     | '/companies'
@@ -272,11 +293,13 @@ export interface FileRouteTypes {
     | '/suppliers'
     | '/team'
     | '/warehouses'
+    | '/super-admin/login'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/super-admin'
     | '/_authenticated/accounting'
     | '/_authenticated/audit'
     | '/_authenticated/companies'
@@ -297,16 +320,25 @@ export interface FileRouteTypes {
     | '/_authenticated/suppliers'
     | '/_authenticated/team'
     | '/_authenticated/warehouses'
+    | '/super-admin/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  SuperAdminRoute: typeof SuperAdminRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/super-admin': {
+      id: '/super-admin'
+      path: '/super-admin'
+      fullPath: '/super-admin'
+      preLoaderRoute: typeof SuperAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -327,6 +359,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/super-admin/login': {
+      id: '/super-admin/login'
+      path: '/login'
+      fullPath: '/super-admin/login'
+      preLoaderRoute: typeof SuperAdminLoginRouteImport
+      parentRoute: typeof SuperAdminRoute
     }
     '/_authenticated/warehouses': {
       id: '/_authenticated/warehouses'
@@ -520,10 +559,23 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface SuperAdminRouteChildren {
+  SuperAdminLoginRoute: typeof SuperAdminLoginRoute
+}
+
+const SuperAdminRouteChildren: SuperAdminRouteChildren = {
+  SuperAdminLoginRoute: SuperAdminLoginRoute,
+}
+
+const SuperAdminRouteWithChildren = SuperAdminRoute._addFileChildren(
+  SuperAdminRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  SuperAdminRoute: SuperAdminRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
