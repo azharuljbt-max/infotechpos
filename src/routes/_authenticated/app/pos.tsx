@@ -202,7 +202,41 @@ function POSPage() {
       const { error: iErr } = await supabase.from("sale_items").insert(items);
       if (iErr) throw iErr;
 
-      return { sale, receipt_no };
+      // Auto-generate invoice for the sale
+      const invoice_no = `INV-${Date.now().toString(36).toUpperCase()}`;
+      const invStatus = amountPaid >= total ? "paid" : amountPaid > 0 ? "partial" : "unpaid";
+      const { data: invoice, error: invErr } = await supabase
+        .from("invoices")
+        .insert({
+          user_id,
+          invoice_no,
+          customer_name: customer || null,
+          subtotal,
+          discount: discountAmt,
+          tax: taxAmt,
+          total,
+          amount_paid: amountPaid,
+          status: invStatus,
+          notes: notes ? `${notes}\n\nAuto-generated from sale ${receipt_no}` : `Auto-generated from sale ${receipt_no}`,
+        })
+        .select()
+        .single();
+      if (invErr) throw invErr;
+
+      const invItems = cart.map((i) => ({
+        invoice_id: invoice.id,
+        user_id,
+        product_id: i.product_id,
+        product_name: i.name,
+        sku: i.sku,
+        quantity: i.quantity,
+        unit_price: i.price,
+        total: i.price * i.quantity,
+      }));
+      const { error: iiErr } = await supabase.from("invoice_items").insert(invItems);
+      if (iiErr) throw iiErr;
+
+      return { sale, receipt_no, invoice_no };
     },
     onSuccess: ({ receipt_no }) => {
       toast.success(`Sale ${receipt_no} completed`);
