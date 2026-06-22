@@ -1049,36 +1049,69 @@ export type Database = {
       }
       user_settings: {
         Row: {
+          company_address: string | null
+          company_email: string | null
+          company_logo_url: string | null
           company_name: string
+          company_phone: string | null
+          company_tax_id: string | null
+          company_website: string | null
           created_at: string
           currency_code: string
+          currency_position: string
           currency_symbol: string
+          date_format: string
+          decimal_places: number
           default_unit: string
           enabled_units: string[]
+          invoice_footer: string | null
+          invoice_prefix: string
           language: string
           tax_rate: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          company_address?: string | null
+          company_email?: string | null
+          company_logo_url?: string | null
           company_name?: string
+          company_phone?: string | null
+          company_tax_id?: string | null
+          company_website?: string | null
           created_at?: string
           currency_code?: string
+          currency_position?: string
           currency_symbol?: string
+          date_format?: string
+          decimal_places?: number
           default_unit?: string
           enabled_units?: string[]
+          invoice_footer?: string | null
+          invoice_prefix?: string
           language?: string
           tax_rate?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          company_address?: string | null
+          company_email?: string | null
+          company_logo_url?: string | null
           company_name?: string
+          company_phone?: string | null
+          company_tax_id?: string | null
+          company_website?: string | null
           created_at?: string
           currency_code?: string
+          currency_position?: string
           currency_symbol?: string
+          date_format?: string
+          decimal_places?: number
           default_unit?: string
           enabled_units?: string[]
+          invoice_footer?: string | null
+          invoice_prefix?: string
           language?: string
           tax_rate?: number
           updated_at?: string
