@@ -19,20 +19,23 @@ export const Route = createFileRoute("/_authenticated/app/dashboard")({
   component: DashboardPage,
 });
 
-const monthly = [
-  { m: "Jan", sales: 240, purchase: 180 }, { m: "Feb", sales: 280, purchase: 200 },
-  { m: "Mar", sales: 320, purchase: 220 }, { m: "Apr", sales: 300, purchase: 240 },
-  { m: "May", sales: 360, purchase: 260 }, { m: "Jun", sales: 420, purchase: 280 },
-  { m: "Jul", sales: 480, purchase: 320 }, { m: "Aug", sales: 520, purchase: 360 },
-  { m: "Sep", sales: 500, purchase: 340 }, { m: "Oct", sales: 580, purchase: 380 },
-  { m: "Nov", sales: 640, purchase: 420 }, { m: "Dec", sales: 720, purchase: 460 },
-];
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-const ie = [
-  { m: "Jun", income: 420, expense: 280 }, { m: "Jul", income: 480, expense: 310 },
-  { m: "Aug", income: 520, expense: 340 }, { m: "Sep", income: 500, expense: 330 },
-  { m: "Oct", income: 580, expense: 360 }, { m: "Nov", income: 640, expense: 400 },
-];
+function monthBuckets(count: number) {
+  const now = new Date();
+  const buckets: { key: string; m: string; year: number; month: number }[] = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    buckets.push({
+      key: `${d.getFullYear()}-${d.getMonth()}`,
+      m: MONTH_LABELS[d.getMonth()],
+      year: d.getFullYear(),
+      month: d.getMonth(),
+    });
+  }
+  return buckets;
+}
+
 
 function todayRange() {
   const start = new Date(); start.setHours(0, 0, 0, 0);
