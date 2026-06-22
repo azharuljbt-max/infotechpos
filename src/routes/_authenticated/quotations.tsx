@@ -571,3 +571,30 @@ function Stat({ label, value, icon }: { label: string; value: number | string; i
     </Card>
   );
 }
+
+function QuotationPrintWrapper({ id, quotations, onClose }: { id: string | null; quotations: Quotation[]; onClose: () => void }) {
+  const q = quotations.find((x) => x.id === id) ?? null;
+  const { data: items = [] } = useQuery({
+    queryKey: ["quotation-items", id],
+    enabled: !!id,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("quotation_items").select("*").eq("quotation_id", id!);
+      if (error) throw error;
+      return data as QuotationItem[];
+    },
+  });
+  return (
+    <QuotationPrintDialog
+      open={!!id}
+      onOpenChange={(o) => !o && onClose()}
+      quotation={q}
+      items={items.map((it) => ({
+        product_name: it.product_name,
+        sku: it.sku,
+        quantity: Number(it.quantity),
+        unit_price: Number(it.unit_price),
+        total: Number(it.total),
+      }))}
+    />
+  );
+}
