@@ -1,0 +1,1 @@
+CREATE POLICY "super admins manage all companies" ON public.companies FOR ALL TO authenticated USING (public.is_super_admin(auth.uid())) WITH CHECK (public.is_super_admin(auth.uid()));
