@@ -318,7 +318,7 @@ function CompaniesPage() {
                             currency: c.currency, logo_url: c.logo_url ?? "",
                             plan: c.plan, status: c.status,
                             trial_ends_at: c.trial_ends_at ?? "",
-                            is_default: c.is_default, notes: c.notes ?? "",
+                            is_default: c.is_default, default_user_id: c.default_user_id ?? "", notes: c.notes ?? "",
                           });
                           setOpen(true);
                         }}>
