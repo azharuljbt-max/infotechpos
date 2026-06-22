@@ -495,7 +495,7 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
   );
 }
 
-function QuotationDetail({ id, onClose, sym, quotations }: { id: string | null; onClose: () => void; sym: string; quotations: Quotation[] }) {
+function QuotationDetail({ id, onClose, sym, quotations, onPrint }: { id: string | null; onClose: () => void; sym: string; quotations: Quotation[]; onPrint: (id: string) => void }) {
   const q = quotations.find((x) => x.id === id) ?? null;
   const { data: items = [] } = useQuery({
     queryKey: ["quotation-items", id],
@@ -547,7 +547,7 @@ function QuotationDetail({ id, onClose, sym, quotations }: { id: string | null; 
             </div>
             {q.notes && <div className="border-t border-border pt-2 text-xs"><span className="text-muted-foreground">Notes:</span> {q.notes}</div>}
             <div className="flex justify-end gap-2 border-t border-border pt-2">
-              <Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="mr-1.5 h-3.5 w-3.5" />Print</Button>
+              <Button size="sm" variant="outline" onClick={() => q && onPrint(q.id)}><Printer className="mr-1.5 h-3.5 w-3.5" />Print / Preview</Button>
             </div>
           </div>
         )}
