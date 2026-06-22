@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_super_admin/companies")({
+export const Route = createFileRoute("/super-admin/_protected/companies")({
   component: CompaniesPage,
 });
 

@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { SuperAdminShell } from "@/components/super-admin-shell";
 
-export const Route = createFileRoute("/_super_admin")({
+export const Route = createFileRoute("/super-admin/_protected")({
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();

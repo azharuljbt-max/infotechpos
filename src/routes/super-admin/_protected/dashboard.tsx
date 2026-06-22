@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { DollarSign, Wallet, BadgeCheck, CalendarClock, Building2, Sparkles, Users, AlertTriangle } from "lucide-react";
 import { fmt, addDays, usePlans, useSubscriptions, usePayments, useSaasCompanies } from "@/lib/saas";
 
-export const Route = createFileRoute("/_super_admin/dashboard")({
+export const Route = createFileRoute("/super-admin/_protected/dashboard")({
   component: Dashboard,
 });
 

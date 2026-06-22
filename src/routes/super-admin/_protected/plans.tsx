@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PlansEditor } from "@/lib/saas";
 
-export const Route = createFileRoute("/_super_admin/plans")({
+export const Route = createFileRoute("/super-admin/_protected/plans")({
   component: () => (
     <div className="space-y-4">
       <div>

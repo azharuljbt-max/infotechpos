@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSubscriptions, useSaasCompanies, usePlans, addDays } from "@/lib/saas";
 
-export const Route = createFileRoute("/_super_admin/trials")({
+export const Route = createFileRoute("/super-admin/_protected/trials")({
   component: TrialsPage,
 });
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_super_admin/settings")({
+export const Route = createFileRoute("/super-admin/_protected/settings")({
   component: SettingsPage,
 });
 

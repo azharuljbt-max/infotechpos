@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-export const Route = createFileRoute("/_super_admin/audit")({
+export const Route = createFileRoute("/super-admin/_protected/audit")({
   component: AuditPage,
 });
 

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { fmt, usePayments, useSubscriptions, useSaasCompanies, usePlans } from "@/lib/saas";
 
-export const Route = createFileRoute("/_super_admin/reports")({
+export const Route = createFileRoute("/super-admin/_protected/reports")({
   component: ReportsPage,
 });
 

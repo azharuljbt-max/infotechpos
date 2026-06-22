@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PaymentsEditor } from "@/lib/saas";
 
-export const Route = createFileRoute("/_super_admin/payments")({
+export const Route = createFileRoute("/super-admin/_protected/payments")({
   component: () => (
     <div className="space-y-4">
       <div>

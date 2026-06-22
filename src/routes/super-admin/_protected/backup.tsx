@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Archive, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_super_admin/backup")({
+export const Route = createFileRoute("/super-admin/_protected/backup")({
   component: () => (
     <div className="space-y-4">
       <div>

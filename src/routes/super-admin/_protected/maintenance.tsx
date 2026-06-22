@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Database, AlertTriangle, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_super_admin/maintenance")({
+export const Route = createFileRoute("/super-admin/_protected/maintenance")({
   component: () => (
     <div className="space-y-4">
       <div>
