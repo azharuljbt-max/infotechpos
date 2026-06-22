@@ -235,6 +235,9 @@ function CompaniesPage() {
         description="Manage multi-company workspaces, branding and plans."
         actions={
           <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setLoginOpen(true)}>
+              <KeyRound className="mr-1.5 h-3.5 w-3.5" />Company login
+            </Button>
             <Button size="sm" variant="outline" onClick={() => setPwOpen(true)}>
               <KeyRound className="mr-1.5 h-3.5 w-3.5" />Passwords
             </Button>
@@ -242,6 +245,7 @@ function CompaniesPage() {
               <Plus className="mr-1.5 h-3.5 w-3.5" />New company
             </Button>
           </div>
+
         }
       />
 
