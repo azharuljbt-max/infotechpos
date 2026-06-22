@@ -59,6 +59,14 @@ const empty = {
   currency: "USD", logo_url: "",
   plan: "trial", status: "active",
   trial_ends_at: "", is_default: false, notes: "",
+  // Login access (only used when creating a new company)
+  create_login: false,
+  login_full_name: "",
+  login_email: "",
+  login_password: "",
+  login_password_confirm: "",
+  login_role: "admin" as "admin" | "manager" | "staff" | "viewer",
+  login_branch: "",
 };
 
 function CompaniesPage() {
