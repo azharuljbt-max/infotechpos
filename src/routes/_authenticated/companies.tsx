@@ -103,13 +103,23 @@ function CompaniesPage() {
     paid: items.filter((c) => c.plan !== "trial").length,
   }), [items]);
 
+  const createLoginFn = useServerFn(createCompanyUser);
+
   const save = useMutation({
     mutationFn: async (f: typeof empty) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Not signed in");
       if (!f.name) throw new Error("Company name required");
 
-      // If marking default, clear other defaults first
+      // Validate login fields up-front when creating a new company with login enabled.
+      const wantLogin = !f.id && f.create_login;
+      if (wantLogin) {
+        if (!f.login_email) throw new Error("Login email is required");
+        const s = evaluatePassword(f.login_password);
+        if (!s.valid) throw new Error("Login password does not meet all requirements");
+        if (f.login_password !== f.login_password_confirm) throw new Error("Login passwords do not match");
+      }
+
       if (f.is_default) {
         await supabase.from("companies").update({ is_default: false }).eq("user_id", u.user.id);
       }
@@ -139,10 +149,32 @@ function CompaniesPage() {
         const { error } = await supabase.from("companies").insert(payload);
         if (error) throw error;
       }
+
+      if (wantLogin) {
+        await createLoginFn({
+          data: {
+            email: f.login_email.trim(),
+            password: f.login_password,
+            confirmPassword: f.login_password_confirm,
+            fullName: f.login_full_name.trim(),
+            role: f.login_role,
+            branch: f.login_branch.trim(),
+          },
+        });
+      }
+
+      return { createdLogin: wantLogin };
     },
-    onSuccess: () => {
-      toast.success(editing ? "Company updated" : "Company added");
+    onSuccess: (res) => {
+      toast.success(
+        editing
+          ? "Company updated"
+          : res?.createdLogin
+            ? "Company added and login created"
+            : "Company added",
+      );
       qc.invalidateQueries({ queryKey: ["companies"] });
+      qc.invalidateQueries({ queryKey: ["team-members-for-pw"] });
       setOpen(false); setForm(empty);
     },
     onError: (e: Error) => toast.error(e.message),
