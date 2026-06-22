@@ -436,6 +436,25 @@ function CompaniesPage() {
               <Label htmlFor="is_default" className="cursor-pointer">Set as default workspace</Label>
             </div>
             <div className="col-span-2">
+              <Label>Default user</Label>
+              <Select
+                value={form.default_user_id || "__none__"}
+                onValueChange={(v) => setForm({ ...form, default_user_id: v === "__none__" ? "" : v })}
+              >
+                <SelectTrigger><SelectValue placeholder="No default user" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">No default user</SelectItem>
+                  {teamMembers.filter((m) => m.is_active).map((m) => (
+                    <SelectItem key={m.user_id} value={m.user_id}>
+                      {m.full_name || m.email}
+                      <span className="ml-1 text-xs text-muted-foreground">· {m.role}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-xs text-muted-foreground">Used as the default operator for this company's sales, POS and quotations.</p>
+            </div>
+            <div className="col-span-2">
               <Label>Notes</Label>
               <Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </div>
