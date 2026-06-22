@@ -440,6 +440,7 @@ function CompaniesPage() {
                   <CompanyLoginFields form={form} setForm={setForm} />
                 )}
               </div>
+            )}
             {editing && (
               <div className="col-span-2 rounded-md border border-border p-3 flex items-center justify-between gap-3">
                 <div className="flex items-start gap-2">
