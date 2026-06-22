@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/app-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { InvoicePrintDialog } from "@/components/invoice-print-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
@@ -474,6 +475,7 @@ function InvoiceEditor({ open, onClose, editing, sym }: { open: boolean; onClose
 
 function InvoiceDetail({ id, onClose, sym, invoices }: { id: string | null; onClose: () => void; sym: string; invoices: Invoice[] }) {
   const inv = invoices.find((i) => i.id === id) ?? null;
+  const [printOpen, setPrintOpen] = useState(false);
   const { data: items = [] } = useQuery({
     queryKey: ["invoice-items", id],
     enabled: !!id,
@@ -486,52 +488,62 @@ function InvoiceDetail({ id, onClose, sym, invoices }: { id: string | null; onCl
   const fmt = (n: number) => `${sym}${Number(n || 0).toFixed(2)}`;
 
   return (
-    <Dialog open={!!id} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Receipt className="h-4 w-4" /> {inv?.invoice_no}</DialogTitle>
-        </DialogHeader>
-        {inv && (
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Issue: {inv.issue_date}</span>
-              {inv.due_date && <span>Due: {inv.due_date}</span>}
-            </div>
-            {inv.customer_name && (
-              <div className="rounded bg-muted/40 p-2">
-                <div className="font-medium">{inv.customer_name}</div>
-                {inv.customer_email && <div className="text-xs text-muted-foreground">{inv.customer_email}</div>}
-                {inv.customer_phone && <div className="text-xs text-muted-foreground">{inv.customer_phone}</div>}
-                {inv.customer_address && <div className="mt-1 text-xs whitespace-pre-wrap">{inv.customer_address}</div>}
+    <>
+      <Dialog open={!!id} onOpenChange={(o) => !o && onClose()}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Receipt className="h-4 w-4" /> {inv?.invoice_no}</DialogTitle>
+          </DialogHeader>
+          {inv && (
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Issue: {inv.issue_date}</span>
+                {inv.due_date && <span>Due: {inv.due_date}</span>}
               </div>
-            )}
-            <div className="border-t border-border pt-2">
-              {items.map((it) => (
-                <div key={it.id} className="flex justify-between py-1">
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate">{it.product_name}</div>
-                    <div className="text-xs text-muted-foreground">{it.quantity} × {fmt(it.unit_price)}</div>
-                  </div>
-                  <div className="font-medium">{fmt(it.total)}</div>
+              {inv.customer_name && (
+                <div className="rounded bg-muted/40 p-2">
+                  <div className="font-medium">{inv.customer_name}</div>
+                  {inv.customer_email && <div className="text-xs text-muted-foreground">{inv.customer_email}</div>}
+                  {inv.customer_phone && <div className="text-xs text-muted-foreground">{inv.customer_phone}</div>}
+                  {inv.customer_address && <div className="mt-1 text-xs whitespace-pre-wrap">{inv.customer_address}</div>}
                 </div>
-              ))}
+              )}
+              <div className="border-t border-border pt-2">
+                {items.map((it) => (
+                  <div key={it.id} className="flex justify-between py-1">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate">{it.product_name}</div>
+                      <div className="text-xs text-muted-foreground">{it.quantity} × {fmt(it.unit_price)}</div>
+                    </div>
+                    <div className="font-medium">{fmt(it.total)}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-1 border-t border-border pt-2">
+                <Row label="Subtotal" value={fmt(inv.subtotal)} />
+                {Number(inv.discount) > 0 && <Row label="Discount" value={`-${fmt(inv.discount)}`} />}
+                {Number(inv.tax) > 0 && <Row label="Tax" value={fmt(inv.tax)} />}
+                <div className="flex justify-between pt-1 text-base font-semibold"><span>Total</span><span>{fmt(inv.total)}</span></div>
+                <Row label="Paid" value={fmt(inv.amount_paid)} />
+                {inv.total > inv.amount_paid && <Row label="Due" value={fmt(inv.total - inv.amount_paid)} />}
+              </div>
+              {inv.notes && <div className="border-t border-border pt-2 text-xs"><span className="text-muted-foreground">Notes:</span> {inv.notes}</div>}
+              <div className="flex justify-end gap-2 border-t border-border pt-2">
+                <Button size="sm" onClick={() => setPrintOpen(true)}>
+                  <Printer className="mr-1.5 h-3.5 w-3.5" />Print / Preview
+                </Button>
+              </div>
             </div>
-            <div className="space-y-1 border-t border-border pt-2">
-              <Row label="Subtotal" value={fmt(inv.subtotal)} />
-              {Number(inv.discount) > 0 && <Row label="Discount" value={`-${fmt(inv.discount)}`} />}
-              {Number(inv.tax) > 0 && <Row label="Tax" value={fmt(inv.tax)} />}
-              <div className="flex justify-between pt-1 text-base font-semibold"><span>Total</span><span>{fmt(inv.total)}</span></div>
-              <Row label="Paid" value={fmt(inv.amount_paid)} />
-              {inv.total > inv.amount_paid && <Row label="Due" value={fmt(inv.total - inv.amount_paid)} />}
-            </div>
-            {inv.notes && <div className="border-t border-border pt-2 text-xs"><span className="text-muted-foreground">Notes:</span> {inv.notes}</div>}
-            <div className="flex justify-end gap-2 border-t border-border pt-2">
-              <Button size="sm" variant="outline" onClick={() => window.print()}><Printer className="mr-1.5 h-3.5 w-3.5" />Print</Button>
-            </div>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+          )}
+        </DialogContent>
+      </Dialog>
+      <InvoicePrintDialog
+        open={printOpen}
+        onOpenChange={setPrintOpen}
+        invoice={inv}
+        items={items}
+      />
+    </>
   );
 }
 
