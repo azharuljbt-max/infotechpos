@@ -503,6 +503,8 @@ function CompaniesPage() {
       </Dialog>
 
       <PasswordsDialog open={pwOpen} onOpenChange={setPwOpen} />
+      <CompanyLoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
+
     </>
   );
 }
