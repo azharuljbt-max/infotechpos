@@ -440,6 +440,19 @@ function CompaniesPage() {
                   <CompanyLoginFields form={form} setForm={setForm} />
                 )}
               </div>
+            {editing && (
+              <div className="col-span-2 rounded-md border border-border p-3 flex items-center justify-between gap-3">
+                <div className="flex items-start gap-2">
+                  <KeyRound className="mt-0.5 h-4 w-4 text-primary" />
+                  <div>
+                    <div className="text-sm font-medium">Set password</div>
+                    <div className="text-xs text-muted-foreground">Reset the sign-in password for a team member in this workspace.</div>
+                  </div>
+                </div>
+                <Button type="button" size="sm" variant="outline" onClick={() => { setOpen(false); setPwOpen(true); }}>
+                  Set password
+                </Button>
+              </div>
             )}
           </div>
           <DialogFooter>
