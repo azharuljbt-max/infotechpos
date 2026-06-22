@@ -23,6 +23,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { QuotationPrintDialog } from "@/components/quotation-print-dialog";
 
 export const Route = createFileRoute("/_authenticated/quotations")({
   component: QuotationsPage,
@@ -82,6 +83,7 @@ function QuotationsPage() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Quotation | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
+  const [printId, setPrintId] = useState<string | null>(null);
 
   const { data: settings } = useQuery({
     queryKey: ["user-settings"],
@@ -247,6 +249,7 @@ function QuotationsPage() {
                 <TableCell>
                   <div className="flex justify-end gap-1">
                     <Button size="icon" variant="ghost" title="View" onClick={() => setViewId(q.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                    <Button size="icon" variant="ghost" title="Print / Preview" onClick={() => setPrintId(q.id)}><Printer className="h-3.5 w-3.5" /></Button>
                     <Button size="icon" variant="ghost" title="Convert to invoice" onClick={() => { if (confirm(`Convert ${q.quotation_no} to invoice?`)) convertToInvoice.mutate(q); }}>
                       <Send className="h-3.5 w-3.5 text-green-600" />
                     </Button>
@@ -263,7 +266,8 @@ function QuotationsPage() {
       </Card>
 
       <QuotationEditor open={open} onClose={() => setOpen(false)} editing={editing} sym={sym} />
-      <QuotationDetail id={viewId} onClose={() => setViewId(null)} sym={sym} quotations={quotations} />
+      <QuotationDetail id={viewId} onClose={() => setViewId(null)} sym={sym} quotations={quotations} onPrint={(id) => { setViewId(null); setPrintId(id); }} />
+      <QuotationPrintWrapper id={printId} quotations={quotations} onClose={() => setPrintId(null)} />
     </>
   );
 }
