@@ -171,9 +171,14 @@ function CompaniesPage() {
         title="Companies"
         description="Manage multi-company workspaces, branding and plans."
         actions={
-          <Button size="sm" onClick={() => { setForm(empty); setOpen(true); }}>
-            <Plus className="mr-1.5 h-3.5 w-3.5" />New company
-          </Button>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setPwOpen(true)}>
+              <KeyRound className="mr-1.5 h-3.5 w-3.5" />Passwords
+            </Button>
+            <Button size="sm" onClick={() => { setForm(empty); setOpen(true); }}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" />New company
+            </Button>
+          </div>
         }
       />
 
