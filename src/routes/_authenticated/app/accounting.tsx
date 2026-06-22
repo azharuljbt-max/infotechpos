@@ -16,7 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Calculator, Plus, Trash2, Pencil, Wallet, Landmark, TrendingUp, TrendingDown } from "lucide-react";
 
-export const Route = createFileRoute("/_authenticated/accounting")({
+export const Route = createFileRoute("/_authenticated/app/accounting")({
   component: AccountingPage,
 });
 

@@ -340,6 +340,6 @@ function StatCard({ label, value, icon }: { label: string; value: number; icon: 
   );
 }
 
-export const Route = createFileRoute("/_authenticated/audit")({
+export const Route = createFileRoute("/_authenticated/app/audit")({
   component: AuditPage,
 });

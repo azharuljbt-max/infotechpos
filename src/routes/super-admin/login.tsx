@@ -18,7 +18,7 @@ export const Route = createFileRoute("/super-admin/login")({
         .select("user_id")
         .eq("user_id", data.user.id)
         .maybeSingle();
-      if (sa) throw redirect({ to: "/super-admin" });
+      if (sa) throw redirect({ to: "/super-admin/dashboard" });
     }
   },
   component: SuperAdminLogin,
@@ -45,7 +45,7 @@ function SuperAdminLogin() {
         await supabase.auth.signOut();
         throw new Error("This account is not a super admin");
       }
-      navigate({ to: "/super-admin", replace: true });
+      navigate({ to: "/super-admin/dashboard", replace: true });
     } catch (err: any) {
       toast.error(err.message ?? "Sign in failed");
     } finally {

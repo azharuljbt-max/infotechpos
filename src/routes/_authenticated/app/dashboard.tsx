@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { useCurrency } from "@/lib/currency";
 
-export const Route = createFileRoute("/_authenticated/dashboard")({
+export const Route = createFileRoute("/_authenticated/app/dashboard")({
   component: DashboardPage,
 });
 

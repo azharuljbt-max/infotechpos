@@ -19,7 +19,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
-export const Route = createFileRoute("/_authenticated/warehouses")({
+export const Route = createFileRoute("/_authenticated/app/warehouses")({
   component: WarehousesPage,
 });
 
