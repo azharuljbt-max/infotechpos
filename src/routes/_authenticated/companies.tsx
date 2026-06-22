@@ -104,7 +104,24 @@ function CompaniesPage() {
     paid: items.filter((c) => c.plan !== "trial").length,
   }), [items]);
 
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ["team-members-for-pw"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return [];
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("user_id, email, full_name, role, is_active")
+        .eq("owner_id", u.user.id)
+        .not("user_id", "is", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Array<{ user_id: string; email: string; full_name: string | null; role: string; is_active: boolean }>;
+    },
+  });
+
   const createLoginFn = useServerFn(createCompanyUser);
+
 
   const save = useMutation({
     mutationFn: async (f: typeof empty) => {
