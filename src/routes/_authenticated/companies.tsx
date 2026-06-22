@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Search, Pencil, Trash2, Building2, Star, Globe, Phone, Mail, KeyRound, Eye, EyeOff } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Building2, Star, Globe, Phone, Mail, KeyRound, Eye, EyeOff, Check, X, ShieldCheck, AlertTriangle, Loader2 } from "lucide-react";
+import { evaluatePassword, PASSWORD_RULES } from "@/lib/password-strength";
+import { logAudit } from "@/lib/audit";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app-shell";
@@ -402,8 +404,16 @@ function Stat({ label, value }: { label: string; value: string }) {
 function PasswordsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [targetId, setTargetId] = useState<string>("");
   const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
   const [show, setShow] = useState(false);
+  const [confirmEmail, setConfirmEmail] = useState("");
+  const [done, setDone] = useState(false);
   const setPassword = useServerFn(setTeamUserPassword);
+
+  const reset = () => {
+    setTargetId(""); setPw(""); setPw2(""); setShow(false);
+    setConfirmEmail(""); setDone(false);
+  };
 
   const { data: members = [], isLoading } = useQuery({
     queryKey: ["team-members-for-pw"],
@@ -422,72 +432,195 @@ function PasswordsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: 
     },
   });
 
+  const target = members.find((m) => m.user_id === targetId) ?? null;
+  const strength = evaluatePassword(pw);
+  const passwordsMatch = pw.length > 0 && pw === pw2;
+  const emailMatches = !!target && confirmEmail.trim().toLowerCase() === target.email.toLowerCase();
+  const canSubmit = !!target && strength.valid && passwordsMatch && emailMatches;
+
   const mutate = useMutation({
     mutationFn: async () => {
-      if (!targetId) throw new Error("Select a team member");
-      if (pw.length < 8) throw new Error("Password must be at least 8 characters");
-      await setPassword({ data: { targetUserId: targetId, newPassword: pw } });
+      if (!target) throw new Error("Select a team member");
+      if (!strength.valid) throw new Error("Password does not meet all requirements");
+      if (!passwordsMatch) throw new Error("Passwords do not match");
+      if (!emailMatches) throw new Error("Confirmation email does not match");
+      await setPassword({
+        data: {
+          targetUserId: target.user_id,
+          newPassword: pw,
+          confirmPassword: pw2,
+          confirmEmail: confirmEmail.trim(),
+        },
+      });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      if (target) {
+        await logAudit({
+          module: "team",
+          action: "password.reset",
+          entity_type: "user",
+          entity_id: target.user_id,
+          description: `Reset password for ${target.full_name || target.email}`,
+          severity: "warning",
+        });
+      }
       toast.success("Password updated");
-      setPw(""); setTargetId(""); setShow(false);
-      onOpenChange(false);
+      setDone(true);
     },
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const meterColor =
+    strength.score >= 6 ? "bg-success"
+    : strength.score >= 5 ? "bg-success/80"
+    : strength.score >= 4 ? "bg-warning"
+    : strength.score >= 2 ? "bg-warning/70"
+    : "bg-destructive";
+
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) { setPw(""); setTargetId(""); setShow(false); } onOpenChange(v); }}>
-      <DialogContent className="max-w-md">
+    <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Set user password</DialogTitle>
-          <DialogDescription>Reset the login password for a team member in your workspace.</DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            Reset team member password
+          </DialogTitle>
+          <DialogDescription>
+            Set a new sign-in password for a user in your workspace. They can sign in immediately with the new password — existing sessions stay active until they expire.
+          </DialogDescription>
         </DialogHeader>
-        <div className="space-y-3">
-          <div>
-            <Label>Team member</Label>
-            <Select value={targetId} onValueChange={setTargetId}>
-              <SelectTrigger><SelectValue placeholder={isLoading ? "Loading…" : "Select a user"} /></SelectTrigger>
-              <SelectContent>
-                {members.length === 0 ? (
-                  <div className="px-3 py-2 text-xs text-muted-foreground">No active team members</div>
-                ) : members.map((m) => (
-                  <SelectItem key={m.user_id} value={m.user_id}>
-                    {m.full_name || m.email} <span className="text-xs text-muted-foreground">· {m.role}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>New password</Label>
-            <div className="relative">
-              <Input
-                type={show ? "text" : "password"}
-                value={pw}
-                onChange={(e) => setPw(e.target.value)}
-                placeholder="At least 8 characters"
-                autoComplete="new-password"
-                className="pr-9"
-              />
-              <button
-                type="button"
-                onClick={() => setShow((s) => !s)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                tabIndex={-1}
-              >
-                {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+
+        {done ? (
+          <div className="space-y-3 py-2">
+            <div className="flex items-start gap-3 rounded-md border border-success/30 bg-success/10 p-3 text-sm">
+              <Check className="mt-0.5 h-4 w-4 text-success" />
+              <div>
+                <div className="font-medium">Password updated</div>
+                <div className="text-xs text-muted-foreground">
+                  {target?.full_name || target?.email} can now sign in with the new password. Share it through a secure channel — it is not stored or sent by email.
+                </div>
+              </div>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">The user can sign in with this new password immediately.</p>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => { reset(); }}>Reset another</Button>
+              <Button onClick={() => { reset(); onOpenChange(false); }}>Done</Button>
+            </DialogFooter>
           </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={() => mutate.mutate()} disabled={mutate.isPending || !targetId || pw.length < 8}>
-            {mutate.isPending ? "Updating…" : "Update password"}
-          </Button>
-        </DialogFooter>
+        ) : (
+          <>
+            <div className="space-y-4">
+              <div>
+                <Label>Team member</Label>
+                <Select value={targetId} onValueChange={(v) => { setTargetId(v); setConfirmEmail(""); }}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={isLoading ? "Loading…" : "Select a user"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.length === 0 ? (
+                      <div className="px-3 py-2 text-xs text-muted-foreground">No team members yet</div>
+                    ) : members.map((m) => (
+                      <SelectItem key={m.user_id} value={m.user_id} disabled={!m.is_active}>
+                        {m.full_name || m.email}
+                        <span className="ml-1 text-xs text-muted-foreground">· {m.role}{!m.is_active && " · inactive"}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label>New password</Label>
+                <div className="relative">
+                  <Input
+                    type={show ? "text" : "password"}
+                    value={pw}
+                    onChange={(e) => setPw(e.target.value)}
+                    placeholder="Create a strong password"
+                    autoComplete="new-password"
+                    className="pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow((s) => !s)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    tabIndex={-1}
+                    aria-label={show ? "Hide password" : "Show password"}
+                  >
+                    {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+
+                <div className="mt-2 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className={`h-full transition-all ${meterColor}`}
+                        style={{ width: `${(strength.score / strength.max) * 100}%` }}
+                      />
+                    </div>
+                    <span className="w-16 text-right text-xs font-medium text-muted-foreground">{pw ? strength.label : "—"}</span>
+                  </div>
+                  <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                    {PASSWORD_RULES.map((r) => {
+                      const ok = strength.passed.has(r.id);
+                      return (
+                        <li key={r.id} className={`flex items-center gap-1.5 ${ok ? "text-success" : "text-muted-foreground"}`}>
+                          {ok ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                          {r.label}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <Label>Confirm new password</Label>
+                <Input
+                  type={show ? "text" : "password"}
+                  value={pw2}
+                  onChange={(e) => setPw2(e.target.value)}
+                  placeholder="Re-enter the password"
+                  autoComplete="new-password"
+                  aria-invalid={pw2.length > 0 && !passwordsMatch}
+                />
+                {pw2.length > 0 && !passwordsMatch && (
+                  <p className="mt-1 text-xs text-destructive">Passwords do not match.</p>
+                )}
+              </div>
+
+              {target && (
+                <div className="rounded-md border border-warning/30 bg-warning/10 p-3">
+                  <div className="flex items-start gap-2 text-xs">
+                    <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-warning" />
+                    <div>
+                      <div className="font-medium text-foreground">Confirm this is the right user</div>
+                      <div className="text-muted-foreground">
+                        Type <span className="font-mono">{target.email}</span> to confirm the reset.
+                      </div>
+                    </div>
+                  </div>
+                  <Input
+                    className="mt-2 h-8"
+                    value={confirmEmail}
+                    onChange={(e) => setConfirmEmail(e.target.value)}
+                    placeholder={target.email}
+                    autoComplete="off"
+                    aria-invalid={confirmEmail.length > 0 && !emailMatches}
+                  />
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => onOpenChange(false)} disabled={mutate.isPending}>Cancel</Button>
+              <Button onClick={() => mutate.mutate()} disabled={!canSubmit || mutate.isPending}>
+                {mutate.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                {mutate.isPending ? "Updating…" : "Reset password"}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );
