@@ -75,25 +75,65 @@ function DashboardPage() {
     { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`, tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
   ];
 
-  const topProducts = [
-    { name: "iPhone 15 Pro 256GB", sold: 142, revenue: fmtMoney(19880000) },
-    { name: "Samsung Galaxy S24", sold: 98, revenue: fmtMoney(10780000) },
-    { name: "MacBook Air M3", sold: 56, revenue: fmtMoney(7840000) },
-    { name: "AirPods Pro 2", sold: 312, revenue: fmtMoney(9360000) },
-    { name: "iPad Air", sold: 74, revenue: fmtMoney(5180000) },
-  ];
-  const lowStock = [
-    { name: "USB-C Cable 2m", sku: "CBL-USC-002", stock: 4, reorder: 20 },
-    { name: "Logitech MX Master 3S", sku: "MOU-LGT-3S", stock: 2, reorder: 10 },
-    { name: "Anker 65W Charger", sku: "CHG-ANK-65W", stock: 6, reorder: 25 },
-  ];
-  const recentOrders = [
-    { id: "INV-10284", customer: "Rahim Trading", amount: fmtMoney(24500), status: "Paid" },
-    { id: "INV-10283", customer: "Karim Electronics", amount: fmtMoney(87200), status: "Pending" },
-    { id: "INV-10282", customer: "Walk-in", amount: fmtMoney(3150), status: "Paid" },
-    { id: "INV-10281", customer: "Hossain & Sons", amount: fmtMoney(142000), status: "Partial" },
-    { id: "INV-10280", customer: "Walk-in", amount: fmtMoney(8900), status: "Paid" },
-  ];
+  const { data: topProducts = [] } = useQuery({
+    queryKey: ["dashboard-top-products"],
+    queryFn: async () => {
+      const since = new Date(); since.setDate(since.getDate() - 30);
+      const { data } = await supabase
+        .from("sale_items")
+        .select("product_name, quantity, total")
+        .gte("created_at", since.toISOString());
+      const map = new Map<string, { name: string; sold: number; revenue: number }>();
+      for (const r of data ?? []) {
+        const key = r.product_name ?? "Unknown";
+        const cur = map.get(key) ?? { name: key, sold: 0, revenue: 0 };
+        cur.sold += Number(r.quantity ?? 0);
+        cur.revenue += Number(r.total ?? 0);
+        map.set(key, cur);
+      }
+      return Array.from(map.values()).sort((a, b) => b.sold - a.sold).slice(0, 5);
+    },
+  });
+
+  const { data: lowStock = [] } = useQuery({
+    queryKey: ["dashboard-low-stock"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("name, sku, stock, reorder_level")
+        .order("stock", { ascending: true })
+        .limit(50);
+      return (data ?? [])
+        .filter((p) => Number(p.reorder_level ?? 0) > 0 && Number(p.stock ?? 0) <= Number(p.reorder_level ?? 0))
+        .slice(0, 5)
+        .map((p) => ({ name: p.name, sku: p.sku ?? "—", stock: Number(p.stock ?? 0), reorder: Number(p.reorder_level ?? 0) }));
+    },
+  });
+
+  const { data: recentOrders = [] } = useQuery({
+    queryKey: ["dashboard-recent-orders"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("sales")
+        .select("id, receipt_no, customer_name, total, status, amount_paid")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      return (data ?? []).map((s) => {
+        const paid = Number(s.amount_paid ?? 0);
+        const total = Number(s.total ?? 0);
+        const status = s.status
+          ? s.status
+          : paid >= total ? "Paid" : paid > 0 ? "Partial" : "Pending";
+        return {
+          id: s.receipt_no ?? s.id.slice(0, 8),
+          customer: s.customer_name ?? "Walk-in",
+          amount: fmtMoney(total),
+          status: status.charAt(0).toUpperCase() + status.slice(1),
+        };
+      });
+    },
+  });
+
   return (
     <>
       <PageHeader
