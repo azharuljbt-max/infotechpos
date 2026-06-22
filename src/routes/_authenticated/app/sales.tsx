@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { BadgePercent, Search, Eye, Trash2, Receipt, Plus, TrendingUp, DollarSign, ShoppingCart } from "lucide-react";
+import { BadgePercent, Search, Eye, Trash2, Receipt, Plus, TrendingUp, DollarSign, ShoppingCart, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app-shell";
@@ -119,6 +119,58 @@ function SalesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const genInvoice = useMutation({
+    mutationFn: async (sale: Sale) => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) throw new Error("Not signed in");
+      const user_id = u.user.id;
+
+      // Check if invoice already exists for this sale (by note marker)
+      const marker = `sale ${sale.receipt_no}`;
+      const { data: existing } = await supabase
+        .from("invoices")
+        .select("id, invoice_no")
+        .eq("user_id", user_id)
+        .ilike("notes", `%${marker}%`)
+        .maybeSingle();
+      if (existing) return { invoice_no: existing.invoice_no, existed: true };
+
+      const { data: items, error: iErr } = await supabase
+        .from("sale_items").select("*").eq("sale_id", sale.id);
+      if (iErr) throw iErr;
+
+      const invoice_no = `INV-${Date.now().toString(36).toUpperCase()}`;
+      const status = Number(sale.amount_paid) >= Number(sale.total)
+        ? "paid" : Number(sale.amount_paid) > 0 ? "partial" : "unpaid";
+      const { data: inv, error: invErr } = await supabase.from("invoices").insert({
+        user_id, invoice_no,
+        customer_name: sale.customer_name,
+        subtotal: sale.subtotal, discount: sale.discount, tax: sale.tax,
+        total: sale.total, amount_paid: sale.amount_paid, status,
+        notes: `Generated from sale ${sale.receipt_no}`,
+      }).select().single();
+      if (invErr) throw invErr;
+
+      if (items && items.length) {
+        const rows = items.map((it: SaleItem & { product_id?: string | null }) => ({
+          invoice_id: inv.id, user_id,
+          product_id: (it as { product_id?: string | null }).product_id ?? null,
+          product_name: it.product_name, sku: it.sku,
+          quantity: it.quantity, unit_price: it.unit_price, total: it.total,
+        }));
+        const { error: iiErr } = await supabase.from("invoice_items").insert(rows);
+        if (iiErr) throw iiErr;
+      }
+      return { invoice_no, existed: false };
+    },
+    onSuccess: ({ invoice_no, existed }) => {
+      toast.success(existed ? `Invoice already exists: ${invoice_no}` : `Invoice ${invoice_no} generated`);
+      qc.invalidateQueries({ queryKey: ["invoices"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   const fmt = (n: number) => `${sym}${Number(n || 0).toFixed(2)}`;
 
   return (
@@ -175,7 +227,7 @@ function SalesPage() {
               <TableHead>Payment</TableHead>
               <TableHead className="text-right">Total</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-24"></TableHead>
+              <TableHead className="w-32"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -193,8 +245,11 @@ function SalesPage() {
                 <TableCell><Badge variant={s.status === "completed" ? "default" : "secondary"}>{s.status}</Badge></TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
-                    <Button size="icon" variant="ghost" onClick={() => setViewId(s.id)}><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button size="icon" variant="ghost" onClick={() => { if (confirm(`Delete ${s.receipt_no}?`)) del.mutate(s.id); }}>
+                    <Button size="icon" variant="ghost" title="View" onClick={() => setViewId(s.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                    <Button size="icon" variant="ghost" title="Generate Invoice" disabled={genInvoice.isPending} onClick={() => genInvoice.mutate(s)}>
+                      <FileText className="h-3.5 w-3.5 text-blue-500" />
+                    </Button>
+                    <Button size="icon" variant="ghost" title="Delete" onClick={() => { if (confirm(`Delete ${s.receipt_no}?`)) del.mutate(s.id); }}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
                   </div>
