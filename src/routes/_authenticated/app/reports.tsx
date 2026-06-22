@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { BarChart3, Download, TrendingUp, TrendingDown, DollarSign, Package, AlertTriangle } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 
-export const Route = createFileRoute("/_authenticated/reports")({
+export const Route = createFileRoute("/_authenticated/app/reports")({
   component: ReportsPage,
 });
 

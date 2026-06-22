@@ -507,6 +507,6 @@ function Stat({ label, value, icon }: { label: string; value: number; icon: Reac
   );
 }
 
-export const Route = createFileRoute("/_authenticated/team")({
+export const Route = createFileRoute("/_authenticated/app/team")({
   component: TeamPage,
 });

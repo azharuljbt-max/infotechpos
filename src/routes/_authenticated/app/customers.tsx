@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useCurrency } from "@/lib/currency";
 
-export const Route = createFileRoute("/_authenticated/customers")({
+export const Route = createFileRoute("/_authenticated/app/customers")({
   component: CustomersPage,
 });
 

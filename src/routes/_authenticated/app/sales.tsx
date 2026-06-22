@@ -20,7 +20,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/_authenticated/sales")({
+export const Route = createFileRoute("/_authenticated/app/sales")({
   component: SalesPage,
 });
 

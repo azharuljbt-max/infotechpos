@@ -2,13 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  FileSignature, Plus, Search, Eye, Trash2, Edit, Send, Package, X, Printer, CheckCircle2, Clock, FileText, DollarSign,
+  Receipt, Plus, Search, Eye, Trash2, Edit, Send, FileText, DollarSign, Clock, CheckCircle2,
+  Package, X, Minus, Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app-shell";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { InvoicePrintDialog } from "@/components/invoice-print-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
@@ -23,31 +25,31 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { QuotationPrintDialog } from "@/components/quotation-print-dialog";
 
-export const Route = createFileRoute("/_authenticated/quotations")({
-  component: QuotationsPage,
+export const Route = createFileRoute("/_authenticated/app/invoices")({
+  component: InvoicesPage,
 });
 
-type Quotation = {
+type Invoice = {
   id: string;
-  quotation_no: string;
+  invoice_no: string;
   customer_name: string | null;
   customer_email: string | null;
   customer_phone: string | null;
   customer_address: string | null;
   issue_date: string;
-  valid_until: string | null;
+  due_date: string | null;
   subtotal: number;
   discount: number;
   tax: number;
   total: number;
+  amount_paid: number;
   status: string;
   notes: string | null;
   created_at: string;
 };
 
-type QuotationItem = {
+type InvoiceItem = {
   id: string;
   product_id: string | null;
   product_name: string;
@@ -57,7 +59,7 @@ type QuotationItem = {
   total: number;
 };
 
-type Product = { id: string; name: string; sku: string | null; price: number };
+type Product = { id: string; name: string; sku: string | null; price: number; stock: number };
 
 type CartItem = {
   product_id: string | null;
@@ -67,23 +69,22 @@ type CartItem = {
   unit_price: number;
 };
 
-const STATUSES = ["draft", "sent", "accepted", "rejected", "expired"];
+const STATUSES = ["draft", "sent", "paid", "overdue", "cancelled"];
 
 function statusVariant(s: string): "default" | "secondary" | "outline" | "destructive" {
-  if (s === "accepted") return "default";
-  if (s === "rejected" || s === "expired") return "destructive";
+  if (s === "paid") return "default";
+  if (s === "overdue" || s === "cancelled") return "destructive";
   if (s === "sent") return "secondary";
   return "outline";
 }
 
-function QuotationsPage() {
+function InvoicesPage() {
   const qc = useQueryClient();
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState<Quotation | null>(null);
+  const [editing, setEditing] = useState<Invoice | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
-  const [printId, setPrintId] = useState<string | null>(null);
 
   const { data: settings } = useQuery({
     queryKey: ["user-settings"],
@@ -96,88 +97,53 @@ function QuotationsPage() {
   });
   const sym = settings?.currency_symbol ?? "$";
 
-  const { data: quotations = [], isLoading } = useQuery({
-    queryKey: ["quotations"],
+  const { data: invoices = [], isLoading } = useQuery({
+    queryKey: ["invoices"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("quotations").select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("invoices").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return data as Quotation[];
+      return data as Invoice[];
     },
   });
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return quotations.filter((i) => {
+    return invoices.filter((i) => {
       if (statusFilter !== "all" && i.status !== statusFilter) return false;
-      if (q && ![i.quotation_no, i.customer_name, i.customer_email].some((x) => x?.toLowerCase().includes(q))) return false;
+      if (q && ![i.invoice_no, i.customer_name, i.customer_email].some((x) => x?.toLowerCase().includes(q))) return false;
       return true;
     });
-  }, [quotations, query, statusFilter]);
+  }, [invoices, query, statusFilter]);
 
   const stats = useMemo(() => {
-    const sum = (arr: Quotation[]) => arr.reduce((a, x) => a + Number(x.total || 0), 0);
-    const accepted = quotations.filter((q) => q.status === "accepted");
-    const pending = quotations.filter((q) => q.status === "draft" || q.status === "sent");
+    const sum = (arr: Invoice[]) => arr.reduce((a, x) => a + Number(x.total || 0), 0);
+    const paid = invoices.filter((i) => i.status === "paid");
+    const due = invoices.filter((i) => i.status !== "paid" && i.status !== "cancelled");
+    const overdue = invoices.filter((i) => i.status === "overdue");
     return {
-      total: quotations.length,
-      value: sum(quotations),
-      acceptedValue: sum(accepted),
-      pendingCount: pending.length,
+      total: invoices.length,
+      billed: sum(invoices),
+      collected: sum(paid),
+      outstanding: due.reduce((a, x) => a + Number(x.total - x.amount_paid || 0), 0),
+      overdueCount: overdue.length,
     };
-  }, [quotations]);
+  }, [invoices]);
 
   const del = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("quotations").delete().eq("id", id);
+      const { error } = await supabase.from("invoices").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Quotation deleted"); qc.invalidateQueries({ queryKey: ["quotations"] }); },
+    onSuccess: () => { toast.success("Invoice deleted"); qc.invalidateQueries({ queryKey: ["invoices"] }); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase.from("quotations").update({ status }).eq("id", id);
+      const { error } = await supabase.from("invoices").update({ status }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Status updated"); qc.invalidateQueries({ queryKey: ["quotations"] }); },
-  });
-
-  const convertToInvoice = useMutation({
-    mutationFn: async (q: Quotation) => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) throw new Error("Not signed in");
-      const { data: items, error: ierr } = await supabase.from("quotation_items").select("*").eq("quotation_id", q.id);
-      if (ierr) throw ierr;
-      const invoice_no = `INV-${Date.now().toString().slice(-8)}`;
-      const { data: inv, error: cerr } = await supabase.from("invoices").insert({
-        user_id: u.user.id,
-        invoice_no,
-        customer_name: q.customer_name,
-        customer_email: q.customer_email,
-        customer_phone: q.customer_phone,
-        customer_address: q.customer_address,
-        issue_date: new Date().toISOString().slice(0, 10),
-        subtotal: q.subtotal, discount: q.discount, tax: q.tax, total: q.total,
-        status: "draft", notes: q.notes,
-      }).select("id").single();
-      if (cerr) throw cerr;
-      if (items && items.length) {
-        await supabase.from("invoice_items").insert(items.map((it: QuotationItem) => ({
-          invoice_id: inv.id, user_id: u.user!.id,
-          product_id: it.product_id, product_name: it.product_name, sku: it.sku,
-          quantity: it.quantity, unit_price: it.unit_price, total: it.total,
-        })));
-      }
-      await supabase.from("quotations").update({ status: "accepted" }).eq("id", q.id);
-      return invoice_no;
-    },
-    onSuccess: (inv) => {
-      toast.success(`Converted to invoice ${inv}`);
-      qc.invalidateQueries({ queryKey: ["quotations"] });
-      qc.invalidateQueries({ queryKey: ["invoices"] });
-    },
-    onError: (e: Error) => toast.error(e.message),
+    onSuccess: () => { toast.success("Status updated"); qc.invalidateQueries({ queryKey: ["invoices"] }); },
   });
 
   const fmt = (n: number) => `${sym}${Number(n || 0).toFixed(2)}`;
@@ -185,23 +151,23 @@ function QuotationsPage() {
   return (
     <>
       <PageHeader
-        title="Quotations"
-        description="Create and track customer quotes — convert accepted quotes to invoices."
-        actions={<Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}><Plus className="mr-1.5 h-3.5 w-3.5" />New quotation</Button>}
+        title="Invoices"
+        description="Create, send, and track customer invoices and payments."
+        actions={<Button size="sm" onClick={() => { setEditing(null); setOpen(true); }}><Plus className="mr-1.5 h-3.5 w-3.5" />New invoice</Button>}
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="Total quotes" value={stats.total} icon={<FileText className="h-4 w-4" />} />
-        <Stat label="Total value" value={fmt(stats.value)} icon={<DollarSign className="h-4 w-4" />} />
-        <Stat label="Accepted value" value={fmt(stats.acceptedValue)} icon={<CheckCircle2 className="h-4 w-4 text-green-500" />} />
-        <Stat label="Pending" value={stats.pendingCount} icon={<Clock className="h-4 w-4 text-orange-500" />} />
+        <Stat label="Total invoices" value={stats.total} icon={<FileText className="h-4 w-4" />} />
+        <Stat label="Total billed" value={fmt(stats.billed)} icon={<DollarSign className="h-4 w-4" />} />
+        <Stat label="Collected" value={fmt(stats.collected)} icon={<CheckCircle2 className="h-4 w-4 text-green-500" />} />
+        <Stat label="Outstanding" value={fmt(stats.outstanding)} icon={<Clock className="h-4 w-4 text-orange-500" />} />
       </div>
 
       <Card className="p-3">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Quote # or customer…" className="pl-8" />
+            <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Invoice # or customer…" className="pl-8" />
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
@@ -215,31 +181,33 @@ function QuotationsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Quote #</TableHead>
+              <TableHead>Invoice</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Valid until</TableHead>
+              <TableHead>Due</TableHead>
               <TableHead className="text-right">Total</TableHead>
+              <TableHead className="text-right">Paid</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="w-32"></TableHead>
+              <TableHead className="w-28"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">Loading…</TableCell></TableRow>
+              <TableRow><TableCell colSpan={8} className="py-10 text-center text-sm text-muted-foreground">Loading…</TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">No quotations yet</TableCell></TableRow>
-            ) : filtered.map((q) => (
-              <TableRow key={q.id}>
-                <TableCell className="font-medium">{q.quotation_no}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{q.issue_date}</TableCell>
-                <TableCell>{q.customer_name || "—"}</TableCell>
-                <TableCell className="text-xs">{q.valid_until || "—"}</TableCell>
-                <TableCell className="text-right font-medium">{fmt(q.total)}</TableCell>
+              <TableRow><TableCell colSpan={8} className="py-10 text-center text-sm text-muted-foreground">No invoices yet</TableCell></TableRow>
+            ) : filtered.map((i) => (
+              <TableRow key={i.id}>
+                <TableCell className="font-medium">{i.invoice_no}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{i.issue_date}</TableCell>
+                <TableCell>{i.customer_name || "—"}</TableCell>
+                <TableCell className="text-xs">{i.due_date || "—"}</TableCell>
+                <TableCell className="text-right font-medium">{fmt(i.total)}</TableCell>
+                <TableCell className="text-right">{fmt(i.amount_paid)}</TableCell>
                 <TableCell>
-                  <Select value={q.status} onValueChange={(v) => updateStatus.mutate({ id: q.id, status: v })}>
-                    <SelectTrigger className="h-7 w-24">
-                      <Badge variant={statusVariant(q.status)} className="capitalize">{q.status}</Badge>
+                  <Select value={i.status} onValueChange={(v) => updateStatus.mutate({ id: i.id, status: v })}>
+                    <SelectTrigger className="h-7 w-24 capitalize">
+                      <Badge variant={statusVariant(i.status)} className="capitalize">{i.status}</Badge>
                     </SelectTrigger>
                     <SelectContent>
                       {STATUSES.map((s) => <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>)}
@@ -248,13 +216,9 @@ function QuotationsPage() {
                 </TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
-                    <Button size="icon" variant="ghost" title="View" onClick={() => setViewId(q.id)}><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button size="icon" variant="ghost" title="Print / Preview" onClick={() => setPrintId(q.id)}><Printer className="h-3.5 w-3.5" /></Button>
-                    <Button size="icon" variant="ghost" title="Convert to invoice" onClick={() => { if (confirm(`Convert ${q.quotation_no} to invoice?`)) convertToInvoice.mutate(q); }}>
-                      <Send className="h-3.5 w-3.5 text-green-600" />
-                    </Button>
-                    <Button size="icon" variant="ghost" title="Edit" onClick={() => { setEditing(q); setOpen(true); }}><Edit className="h-3.5 w-3.5" /></Button>
-                    <Button size="icon" variant="ghost" onClick={() => { if (confirm(`Delete ${q.quotation_no}?`)) del.mutate(q.id); }}>
+                    <Button size="icon" variant="ghost" onClick={() => setViewId(i.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                    <Button size="icon" variant="ghost" onClick={() => { setEditing(i); setOpen(true); }}><Edit className="h-3.5 w-3.5" /></Button>
+                    <Button size="icon" variant="ghost" onClick={() => { if (confirm(`Delete ${i.invoice_no}?`)) del.mutate(i.id); }}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
                   </div>
@@ -265,32 +229,32 @@ function QuotationsPage() {
         </Table>
       </Card>
 
-      <QuotationEditor open={open} onClose={() => setOpen(false)} editing={editing} sym={sym} />
-      <QuotationDetail id={viewId} onClose={() => setViewId(null)} sym={sym} quotations={quotations} onPrint={(id) => { setViewId(null); setPrintId(id); }} />
-      <QuotationPrintWrapper id={printId} quotations={quotations} onClose={() => setPrintId(null)} />
+      <InvoiceEditor open={open} onClose={() => setOpen(false)} editing={editing} sym={sym} />
+      <InvoiceDetail id={viewId} onClose={() => setViewId(null)} sym={sym} invoices={invoices} />
     </>
   );
 }
 
-function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClose: () => void; editing: Quotation | null; sym: string }) {
+function InvoiceEditor({ open, onClose, editing, sym }: { open: boolean; onClose: () => void; editing: Invoice | null; sym: string }) {
   const qc = useQueryClient();
   const [customer, setCustomer] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [issueDate, setIssueDate] = useState(new Date().toISOString().slice(0, 10));
-  const [validUntil, setValidUntil] = useState("");
+  const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState("draft");
   const [discount, setDiscount] = useState(0);
   const [tax, setTax] = useState(0);
+  const [amountPaid, setAmountPaid] = useState(0);
   const [notes, setNotes] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [productSearch, setProductSearch] = useState("");
 
   const { data: products = [] } = useQuery({
-    queryKey: ["quote-products"],
+    queryKey: ["invoice-products"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("id,name,sku,price").order("name");
+      const { data, error } = await supabase.from("products").select("id,name,sku,price,stock").order("name");
       if (error) throw error;
       return data as Product[];
     },
@@ -305,13 +269,14 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
       setPhone(editing.customer_phone ?? "");
       setAddress(editing.customer_address ?? "");
       setIssueDate(editing.issue_date);
-      setValidUntil(editing.valid_until ?? "");
+      setDueDate(editing.due_date ?? "");
       setStatus(editing.status);
       setDiscount(Number(editing.discount));
       setTax(Number(editing.tax));
+      setAmountPaid(Number(editing.amount_paid));
       setNotes(editing.notes ?? "");
-      supabase.from("quotation_items").select("*").eq("quotation_id", editing.id).then(({ data }) => {
-        setCart((data ?? []).map((d: QuotationItem) => ({
+      supabase.from("invoice_items").select("*").eq("invoice_id", editing.id).then(({ data }) => {
+        setCart((data ?? []).map((d: InvoiceItem) => ({
           product_id: d.product_id, name: d.product_name, sku: d.sku,
           quantity: Number(d.quantity), unit_price: Number(d.unit_price),
         })));
@@ -319,8 +284,8 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
     } else {
       setCustomer(""); setEmail(""); setPhone(""); setAddress("");
       setIssueDate(new Date().toISOString().slice(0, 10));
-      setValidUntil(""); setStatus("draft");
-      setDiscount(0); setTax(0); setNotes(""); setCart([]); setProductSearch("");
+      setDueDate(""); setStatus("draft");
+      setDiscount(0); setTax(0); setAmountPaid(0); setNotes(""); setCart([]); setProductSearch("");
     }
   }, [editing, open]);
 
@@ -330,11 +295,13 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
     return products.filter((p) => p.name.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q)).slice(0, 20);
   }, [products, productSearch]);
 
-  const addProduct = (p: Product) => setCart((c) => {
-    const ex = c.find((x) => x.product_id === p.id);
-    if (ex) return c.map((x) => x.product_id === p.id ? { ...x, quantity: x.quantity + 1 } : x);
-    return [...c, { product_id: p.id, name: p.name, sku: p.sku, quantity: 1, unit_price: Number(p.price) || 0 }];
-  });
+  const addProduct = (p: Product) => {
+    setCart((c) => {
+      const ex = c.find((x) => x.product_id === p.id);
+      if (ex) return c.map((x) => x.product_id === p.id ? { ...x, quantity: x.quantity + 1 } : x);
+      return [...c, { product_id: p.id, name: p.name, sku: p.sku, quantity: 1, unit_price: Number(p.price) || 0 }];
+    });
+  };
   const addBlank = () => setCart((c) => [...c, { product_id: null, name: "", sku: null, quantity: 1, unit_price: 0 }]);
   const updateLine = (idx: number, patch: Partial<CartItem>) =>
     setCart((c) => c.map((x, i) => i === idx ? { ...x, ...patch } : x));
@@ -356,36 +323,42 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
         customer_phone: phone.trim() || null,
         customer_address: address.trim() || null,
         issue_date: issueDate,
-        valid_until: validUntil || null,
+        due_date: dueDate || null,
         subtotal, discount, tax, total,
+        amount_paid: amountPaid,
         status,
         notes: notes.trim() || null,
       };
-      let quoteId: string;
+      let invoiceId: string;
       if (editing) {
-        const { error } = await supabase.from("quotations").update(payload).eq("id", editing.id);
+        const { error } = await supabase.from("invoices").update(payload).eq("id", editing.id);
         if (error) throw error;
-        quoteId = editing.id;
-        await supabase.from("quotation_items").delete().eq("quotation_id", quoteId);
+        invoiceId = editing.id;
+        await supabase.from("invoice_items").delete().eq("invoice_id", invoiceId);
       } else {
-        const quotation_no = `QT-${Date.now().toString().slice(-8)}`;
-        const { data, error } = await supabase.from("quotations").insert({ ...payload, quotation_no }).select("id").single();
+        const invoice_no = `INV-${Date.now().toString().slice(-8)}`;
+        const { data, error } = await supabase.from("invoices").insert({ ...payload, invoice_no }).select("id").single();
         if (error) throw error;
-        quoteId = data.id;
+        invoiceId = data.id;
       }
       const items = cart.filter((c) => c.name.trim()).map((c) => ({
-        quotation_id: quoteId, user_id: u.user!.id,
-        product_id: c.product_id, product_name: c.name, sku: c.sku,
-        quantity: c.quantity, unit_price: c.unit_price, total: c.quantity * c.unit_price,
+        invoice_id: invoiceId,
+        user_id: u.user!.id,
+        product_id: c.product_id,
+        product_name: c.name,
+        sku: c.sku,
+        quantity: c.quantity,
+        unit_price: c.unit_price,
+        total: c.quantity * c.unit_price,
       }));
       if (items.length) {
-        const { error } = await supabase.from("quotation_items").insert(items);
+        const { error } = await supabase.from("invoice_items").insert(items);
         if (error) throw error;
       }
     },
     onSuccess: () => {
-      toast.success(editing ? "Quotation updated" : "Quotation created");
-      qc.invalidateQueries({ queryKey: ["quotations"] });
+      toast.success(editing ? "Invoice updated" : "Invoice created");
+      qc.invalidateQueries({ queryKey: ["invoices"] });
       onClose();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -395,7 +368,7 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>{editing ? `Edit ${editing.quotation_no}` : "New quotation"}</DialogTitle>
+          <DialogTitle>{editing ? `Edit ${editing.invoice_no}` : "New invoice"}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 md:grid-cols-[1fr,300px]">
           <div className="space-y-3">
@@ -411,7 +384,7 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
                 </Select>
               </div>
               <div><Label>Issue date</Label><Input type="date" value={issueDate} onChange={(e) => setIssueDate(e.target.value)} /></div>
-              <div><Label>Valid until</Label><Input type="date" value={validUntil} onChange={(e) => setValidUntil(e.target.value)} /></div>
+              <div><Label>Due date</Label><Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} /></div>
             </div>
             <div><Label>Address</Label><Textarea rows={2} value={address} onChange={(e) => setAddress(e.target.value)} /></div>
 
@@ -420,7 +393,8 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
               <div className="flex gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                  <Input value={productSearch} onChange={(e) => setProductSearch(e.target.value)} placeholder="Search products…" className="pl-8" />
+                  <Input value={productSearch} onChange={(e) => setProductSearch(e.target.value)}
+                    placeholder="Search products…" className="pl-8" />
                 </div>
                 <Button variant="outline" size="sm" onClick={addBlank}><Plus className="mr-1 h-3.5 w-3.5" />Blank</Button>
               </div>
@@ -481,13 +455,17 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
             <div className="flex items-center justify-between border-t border-border pt-2 text-base font-semibold">
               <span>Total</span><span>{fmt(total)}</span>
             </div>
-            <div><Label>Notes / Terms</Label><Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+            <div><Label>Amount paid</Label>
+              <Input type="number" min={0} step="0.01" value={amountPaid} onChange={(e) => setAmountPaid(Number(e.target.value) || 0)} />
+              {amountPaid < total && <div className="mt-1 text-xs text-orange-500">Due: {fmt(total - amountPaid)}</div>}
+            </div>
+            <div><Label>Notes</Label><Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
           </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={() => save.mutate()} disabled={cart.length === 0 || save.isPending}>
-            <FileSignature className="mr-1.5 h-3.5 w-3.5" />{save.isPending ? "Saving…" : editing ? "Update" : "Create"}
+            <Send className="mr-1.5 h-3.5 w-3.5" />{save.isPending ? "Saving…" : editing ? "Update" : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -495,64 +473,77 @@ function QuotationEditor({ open, onClose, editing, sym }: { open: boolean; onClo
   );
 }
 
-function QuotationDetail({ id, onClose, sym, quotations, onPrint }: { id: string | null; onClose: () => void; sym: string; quotations: Quotation[]; onPrint: (id: string) => void }) {
-  const q = quotations.find((x) => x.id === id) ?? null;
+function InvoiceDetail({ id, onClose, sym, invoices }: { id: string | null; onClose: () => void; sym: string; invoices: Invoice[] }) {
+  const inv = invoices.find((i) => i.id === id) ?? null;
+  const [printOpen, setPrintOpen] = useState(false);
   const { data: items = [] } = useQuery({
-    queryKey: ["quotation-items", id],
+    queryKey: ["invoice-items", id],
     enabled: !!id,
     queryFn: async () => {
-      const { data, error } = await supabase.from("quotation_items").select("*").eq("quotation_id", id!);
+      const { data, error } = await supabase.from("invoice_items").select("*").eq("invoice_id", id!);
       if (error) throw error;
-      return data as QuotationItem[];
+      return data as InvoiceItem[];
     },
   });
   const fmt = (n: number) => `${sym}${Number(n || 0).toFixed(2)}`;
 
   return (
-    <Dialog open={!!id} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><FileSignature className="h-4 w-4" /> {q?.quotation_no}</DialogTitle>
-        </DialogHeader>
-        {q && (
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Issue: {q.issue_date}</span>
-              {q.valid_until && <span>Valid until: {q.valid_until}</span>}
-            </div>
-            {q.customer_name && (
-              <div className="rounded bg-muted/40 p-2">
-                <div className="font-medium">{q.customer_name}</div>
-                {q.customer_email && <div className="text-xs text-muted-foreground">{q.customer_email}</div>}
-                {q.customer_phone && <div className="text-xs text-muted-foreground">{q.customer_phone}</div>}
-                {q.customer_address && <div className="mt-1 text-xs whitespace-pre-wrap">{q.customer_address}</div>}
+    <>
+      <Dialog open={!!id} onOpenChange={(o) => !o && onClose()}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Receipt className="h-4 w-4" /> {inv?.invoice_no}</DialogTitle>
+          </DialogHeader>
+          {inv && (
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Issue: {inv.issue_date}</span>
+                {inv.due_date && <span>Due: {inv.due_date}</span>}
               </div>
-            )}
-            <div className="border-t border-border pt-2">
-              {items.map((it) => (
-                <div key={it.id} className="flex justify-between py-1">
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate">{it.product_name}</div>
-                    <div className="text-xs text-muted-foreground">{it.quantity} × {fmt(it.unit_price)}</div>
-                  </div>
-                  <div className="font-medium">{fmt(it.total)}</div>
+              {inv.customer_name && (
+                <div className="rounded bg-muted/40 p-2">
+                  <div className="font-medium">{inv.customer_name}</div>
+                  {inv.customer_email && <div className="text-xs text-muted-foreground">{inv.customer_email}</div>}
+                  {inv.customer_phone && <div className="text-xs text-muted-foreground">{inv.customer_phone}</div>}
+                  {inv.customer_address && <div className="mt-1 text-xs whitespace-pre-wrap">{inv.customer_address}</div>}
                 </div>
-              ))}
+              )}
+              <div className="border-t border-border pt-2">
+                {items.map((it) => (
+                  <div key={it.id} className="flex justify-between py-1">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate">{it.product_name}</div>
+                      <div className="text-xs text-muted-foreground">{it.quantity} × {fmt(it.unit_price)}</div>
+                    </div>
+                    <div className="font-medium">{fmt(it.total)}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-1 border-t border-border pt-2">
+                <Row label="Subtotal" value={fmt(inv.subtotal)} />
+                {Number(inv.discount) > 0 && <Row label="Discount" value={`-${fmt(inv.discount)}`} />}
+                {Number(inv.tax) > 0 && <Row label="Tax" value={fmt(inv.tax)} />}
+                <div className="flex justify-between pt-1 text-base font-semibold"><span>Total</span><span>{fmt(inv.total)}</span></div>
+                <Row label="Paid" value={fmt(inv.amount_paid)} />
+                {inv.total > inv.amount_paid && <Row label="Due" value={fmt(inv.total - inv.amount_paid)} />}
+              </div>
+              {inv.notes && <div className="border-t border-border pt-2 text-xs"><span className="text-muted-foreground">Notes:</span> {inv.notes}</div>}
+              <div className="flex justify-end gap-2 border-t border-border pt-2">
+                <Button size="sm" onClick={() => setPrintOpen(true)}>
+                  <Printer className="mr-1.5 h-3.5 w-3.5" />Print / Preview
+                </Button>
+              </div>
             </div>
-            <div className="space-y-1 border-t border-border pt-2">
-              <Row label="Subtotal" value={fmt(q.subtotal)} />
-              {Number(q.discount) > 0 && <Row label="Discount" value={`-${fmt(q.discount)}`} />}
-              {Number(q.tax) > 0 && <Row label="Tax" value={fmt(q.tax)} />}
-              <div className="flex justify-between pt-1 text-base font-semibold"><span>Total</span><span>{fmt(q.total)}</span></div>
-            </div>
-            {q.notes && <div className="border-t border-border pt-2 text-xs"><span className="text-muted-foreground">Notes:</span> {q.notes}</div>}
-            <div className="flex justify-end gap-2 border-t border-border pt-2">
-              <Button size="sm" variant="outline" onClick={() => q && onPrint(q.id)}><Printer className="mr-1.5 h-3.5 w-3.5" />Print / Preview</Button>
-            </div>
-          </div>
-        )}
-      </DialogContent>
-    </Dialog>
+          )}
+        </DialogContent>
+      </Dialog>
+      <InvoicePrintDialog
+        open={printOpen}
+        onOpenChange={setPrintOpen}
+        invoice={inv}
+        items={items}
+      />
+    </>
   );
 }
 
@@ -569,32 +560,5 @@ function Stat({ label, value, icon }: { label: string; value: number | string; i
         <div className="truncate text-lg font-semibold">{value}</div>
       </div>
     </Card>
-  );
-}
-
-function QuotationPrintWrapper({ id, quotations, onClose }: { id: string | null; quotations: Quotation[]; onClose: () => void }) {
-  const q = quotations.find((x) => x.id === id) ?? null;
-  const { data: items = [] } = useQuery({
-    queryKey: ["quotation-items", id],
-    enabled: !!id,
-    queryFn: async () => {
-      const { data, error } = await supabase.from("quotation_items").select("*").eq("quotation_id", id!);
-      if (error) throw error;
-      return data as QuotationItem[];
-    },
-  });
-  return (
-    <QuotationPrintDialog
-      open={!!id}
-      onOpenChange={(o) => !o && onClose()}
-      quotation={q}
-      items={items.map((it) => ({
-        product_name: it.product_name,
-        sku: it.sku,
-        quantity: Number(it.quantity),
-        unit_price: Number(it.unit_price),
-        total: Number(it.total),
-      }))}
-    />
   );
 }

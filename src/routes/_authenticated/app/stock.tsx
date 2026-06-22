@@ -31,7 +31,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/lib/currency";
 
-export const Route = createFileRoute("/_authenticated/stock")({
+export const Route = createFileRoute("/_authenticated/app/stock")({
   component: StockPage,
 });
 

@@ -26,7 +26,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
-export const Route = createFileRoute("/_authenticated/companies")({
+export const Route = createFileRoute("/_authenticated/app/companies")({
   component: CompaniesPage,
 });
 

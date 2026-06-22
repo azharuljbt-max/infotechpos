@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export const Route = createFileRoute("/_authenticated/notifications")({
+export const Route = createFileRoute("/_authenticated/app/notifications")({
   component: NotificationsPage,
 });
 

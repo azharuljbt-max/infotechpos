@@ -21,7 +21,7 @@ import {
   DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 
-export const Route = createFileRoute("/_authenticated/pos")({
+export const Route = createFileRoute("/_authenticated/app/pos")({
   component: POSPage,
 });
 

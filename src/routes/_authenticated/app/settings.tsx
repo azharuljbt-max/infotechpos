@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/_authenticated/settings")({
+export const Route = createFileRoute("/_authenticated/app/settings")({
   component: SettingsPage,
 });
 
