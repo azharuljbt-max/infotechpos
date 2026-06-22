@@ -398,3 +398,97 @@ function Stat({ label, value }: { label: string; value: string }) {
     </Card>
   );
 }
+
+function PasswordsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  const [targetId, setTargetId] = useState<string>("");
+  const [pw, setPw] = useState("");
+  const [show, setShow] = useState(false);
+  const setPassword = useServerFn(setTeamUserPassword);
+
+  const { data: members = [], isLoading } = useQuery({
+    queryKey: ["team-members-for-pw"],
+    enabled: open,
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return [];
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("user_id, email, full_name, role, is_active")
+        .eq("owner_id", u.user.id)
+        .not("user_id", "is", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Array<{ user_id: string; email: string; full_name: string | null; role: string; is_active: boolean }>;
+    },
+  });
+
+  const mutate = useMutation({
+    mutationFn: async () => {
+      if (!targetId) throw new Error("Select a team member");
+      if (pw.length < 8) throw new Error("Password must be at least 8 characters");
+      await setPassword({ data: { targetUserId: targetId, newPassword: pw } });
+    },
+    onSuccess: () => {
+      toast.success("Password updated");
+      setPw(""); setTargetId(""); setShow(false);
+      onOpenChange(false);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { setPw(""); setTargetId(""); setShow(false); } onOpenChange(v); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Set user password</DialogTitle>
+          <DialogDescription>Reset the login password for a team member in your workspace.</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3">
+          <div>
+            <Label>Team member</Label>
+            <Select value={targetId} onValueChange={setTargetId}>
+              <SelectTrigger><SelectValue placeholder={isLoading ? "Loading…" : "Select a user"} /></SelectTrigger>
+              <SelectContent>
+                {members.length === 0 ? (
+                  <div className="px-3 py-2 text-xs text-muted-foreground">No active team members</div>
+                ) : members.map((m) => (
+                  <SelectItem key={m.user_id} value={m.user_id}>
+                    {m.full_name || m.email} <span className="text-xs text-muted-foreground">· {m.role}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>New password</Label>
+            <div className="relative">
+              <Input
+                type={show ? "text" : "password"}
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
+                className="pr-9"
+              />
+              <button
+                type="button"
+                onClick={() => setShow((s) => !s)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                tabIndex={-1}
+              >
+                {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">The user can sign in with this new password immediately.</p>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={() => mutate.mutate()} disabled={mutate.isPending || !targetId || pw.length < 8}>
+            {mutate.isPending ? "Updating…" : "Update password"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
