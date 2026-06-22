@@ -56,6 +56,8 @@ export const NAV: NavGroup[] = [
       { label: "Notifications", to: "/notifications", icon: Bell },
       { label: "Settings", to: "/settings", icon: Settings },
       { label: "Companies", to: "/companies", icon: FileText },
+      { label: "SaaS", to: "/saas", icon: Sparkles },
     ],
   },
 ];
+
