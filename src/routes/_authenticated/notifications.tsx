@@ -273,7 +273,6 @@ function NotificationsPage() {
       <PageHeader
         title="Notifications"
         description="Alerts for low stock, dues, payments, and orders."
-        icon={<Bell className="h-5 w-5" />}
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={runScan} disabled={scanning}>
