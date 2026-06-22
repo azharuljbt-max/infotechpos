@@ -141,6 +141,7 @@ function CompaniesPage() {
         status: f.status,
         trial_ends_at: f.trial_ends_at || null,
         is_default: f.is_default,
+        default_user_id: f.default_user_id || null,
         notes: f.notes || null,
       };
       if (f.id) {
