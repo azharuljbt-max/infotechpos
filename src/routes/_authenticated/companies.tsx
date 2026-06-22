@@ -384,6 +384,8 @@ function CompaniesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <PasswordsDialog open={pwOpen} onOpenChange={setPwOpen} />
     </>
   );
 }
