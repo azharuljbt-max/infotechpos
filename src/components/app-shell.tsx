@@ -93,7 +93,7 @@ export function AppShell() {
         </div>
 
         <nav className="flex-1 overflow-y-auto px-2 py-3">
-          {NAV.map((group) => (
+          {navGroups.map((group) => (
             <div key={group.label} className="mb-4">
               <div className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 {t(group.label)}
