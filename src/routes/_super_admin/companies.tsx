@@ -27,7 +27,7 @@ function CompaniesPage() {
 
   const toggle = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase.from("companies").update({ is_active }).eq("id", id);
+      const { error } = await (supabase.from("companies") as any).update({ is_active }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Updated"); qc.invalidateQueries({ queryKey: ["sa-all-companies"] }); },

@@ -10,9 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as Super_adminRouteRouteImport } from './routes/_super_admin/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperAdminLoginRouteImport } from './routes/super-admin.login'
+import { Route as Super_adminUsersRouteImport } from './routes/_super_admin/users'
+import { Route as Super_adminTrialsRouteImport } from './routes/_super_admin/trials'
+import { Route as Super_adminSubscriptionsRouteImport } from './routes/_super_admin/subscriptions'
+import { Route as Super_adminSettingsRouteImport } from './routes/_super_admin/settings'
+import { Route as Super_adminReportsRouteImport } from './routes/_super_admin/reports'
+import { Route as Super_adminPlansRouteImport } from './routes/_super_admin/plans'
+import { Route as Super_adminPaymentsRouteImport } from './routes/_super_admin/payments'
+import { Route as Super_adminMaintenanceRouteImport } from './routes/_super_admin/maintenance'
+import { Route as Super_adminDashboardRouteImport } from './routes/_super_admin/dashboard'
+import { Route as Super_adminCompaniesRouteImport } from './routes/_super_admin/companies'
+import { Route as Super_adminBackupRouteImport } from './routes/_super_admin/backup'
+import { Route as Super_adminAuditRouteImport } from './routes/_super_admin/audit'
+import { Route as AuthenticatedAppRouteRouteImport } from './routes/_authenticated/app/route'
 import { Route as AuthenticatedAppWarehousesRouteImport } from './routes/_authenticated/app/warehouses'
 import { Route as AuthenticatedAppTeamRouteImport } from './routes/_authenticated/app/team'
 import { Route as AuthenticatedAppSuppliersRouteImport } from './routes/_authenticated/app/suppliers'
@@ -38,6 +52,10 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Super_adminRouteRoute = Super_adminRouteRouteImport.update({
+  id: '/_super_admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -52,118 +70,197 @@ const SuperAdminLoginRoute = SuperAdminLoginRouteImport.update({
   path: '/super-admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Super_adminUsersRoute = Super_adminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminTrialsRoute = Super_adminTrialsRouteImport.update({
+  id: '/trials',
+  path: '/trials',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminSubscriptionsRoute =
+  Super_adminSubscriptionsRouteImport.update({
+    id: '/subscriptions',
+    path: '/subscriptions',
+    getParentRoute: () => Super_adminRouteRoute,
+  } as any)
+const Super_adminSettingsRoute = Super_adminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminReportsRoute = Super_adminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminPlansRoute = Super_adminPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminPaymentsRoute = Super_adminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminMaintenanceRoute = Super_adminMaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminDashboardRoute = Super_adminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminCompaniesRoute = Super_adminCompaniesRouteImport.update({
+  id: '/companies',
+  path: '/companies',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminBackupRoute = Super_adminBackupRouteImport.update({
+  id: '/backup',
+  path: '/backup',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const Super_adminAuditRoute = Super_adminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => Super_adminRouteRoute,
+} as any)
+const AuthenticatedAppRouteRoute = AuthenticatedAppRouteRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppWarehousesRoute =
   AuthenticatedAppWarehousesRouteImport.update({
-    id: '/app/warehouses',
-    path: '/app/warehouses',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/warehouses',
+    path: '/warehouses',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppTeamRoute = AuthenticatedAppTeamRouteImport.update({
-  id: '/app/team',
-  path: '/app/team',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppSuppliersRoute =
   AuthenticatedAppSuppliersRouteImport.update({
-    id: '/app/suppliers',
-    path: '/app/suppliers',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/suppliers',
+    path: '/suppliers',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppStockRoute = AuthenticatedAppStockRouteImport.update({
-  id: '/app/stock',
-  path: '/app/stock',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/stock',
+  path: '/stock',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppSettingsRoute =
   AuthenticatedAppSettingsRouteImport.update({
-    id: '/app/settings',
-    path: '/app/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppSalesRoute = AuthenticatedAppSalesRouteImport.update({
-  id: '/app/sales',
-  path: '/app/sales',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/sales',
+  path: '/sales',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppReportsRoute = AuthenticatedAppReportsRouteImport.update({
-  id: '/app/reports',
-  path: '/app/reports',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppQuotationsRoute =
   AuthenticatedAppQuotationsRouteImport.update({
-    id: '/app/quotations',
-    path: '/app/quotations',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/quotations',
+    path: '/quotations',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppPurchasesRoute =
   AuthenticatedAppPurchasesRouteImport.update({
-    id: '/app/purchases',
-    path: '/app/purchases',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/purchases',
+    path: '/purchases',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppProductsRoute =
   AuthenticatedAppProductsRouteImport.update({
-    id: '/app/products',
-    path: '/app/products',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/products',
+    path: '/products',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppPosRoute = AuthenticatedAppPosRouteImport.update({
-  id: '/app/pos',
-  path: '/app/pos',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/pos',
+  path: '/pos',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppNotificationsRoute =
   AuthenticatedAppNotificationsRouteImport.update({
-    id: '/app/notifications',
-    path: '/app/notifications',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppInvoicesRoute =
   AuthenticatedAppInvoicesRouteImport.update({
-    id: '/app/invoices',
-    path: '/app/invoices',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/invoices',
+    path: '/invoices',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppExpensesRoute =
   AuthenticatedAppExpensesRouteImport.update({
-    id: '/app/expenses',
-    path: '/app/expenses',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/expenses',
+    path: '/expenses',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppDashboardRoute =
   AuthenticatedAppDashboardRouteImport.update({
-    id: '/app/dashboard',
-    path: '/app/dashboard',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/dashboard',
+    path: '/dashboard',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppCustomersRoute =
   AuthenticatedAppCustomersRouteImport.update({
-    id: '/app/customers',
-    path: '/app/customers',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppCompaniesRoute =
   AuthenticatedAppCompaniesRouteImport.update({
-    id: '/app/companies',
-    path: '/app/companies',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/companies',
+    path: '/companies',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 const AuthenticatedAppAuditRoute = AuthenticatedAppAuditRouteImport.update({
-  id: '/app/audit',
-  path: '/app/audit',
-  getParentRoute: () => AuthenticatedRouteRoute,
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAppRouteRoute,
 } as any)
 const AuthenticatedAppAccountingRoute =
   AuthenticatedAppAccountingRouteImport.update({
-    id: '/app/accounting',
-    path: '/app/accounting',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/accounting',
+    path: '/accounting',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/audit': typeof Super_adminAuditRoute
+  '/backup': typeof Super_adminBackupRoute
+  '/companies': typeof Super_adminCompaniesRoute
+  '/dashboard': typeof Super_adminDashboardRoute
+  '/maintenance': typeof Super_adminMaintenanceRoute
+  '/payments': typeof Super_adminPaymentsRoute
+  '/plans': typeof Super_adminPlansRoute
+  '/reports': typeof Super_adminReportsRoute
+  '/settings': typeof Super_adminSettingsRoute
+  '/subscriptions': typeof Super_adminSubscriptionsRoute
+  '/trials': typeof Super_adminTrialsRoute
+  '/users': typeof Super_adminUsersRoute
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/app/accounting': typeof AuthenticatedAppAccountingRoute
   '/app/audit': typeof AuthenticatedAppAuditRoute
@@ -188,6 +285,19 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/audit': typeof Super_adminAuditRoute
+  '/backup': typeof Super_adminBackupRoute
+  '/companies': typeof Super_adminCompaniesRoute
+  '/dashboard': typeof Super_adminDashboardRoute
+  '/maintenance': typeof Super_adminMaintenanceRoute
+  '/payments': typeof Super_adminPaymentsRoute
+  '/plans': typeof Super_adminPlansRoute
+  '/reports': typeof Super_adminReportsRoute
+  '/settings': typeof Super_adminSettingsRoute
+  '/subscriptions': typeof Super_adminSubscriptionsRoute
+  '/trials': typeof Super_adminTrialsRoute
+  '/users': typeof Super_adminUsersRoute
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/app/accounting': typeof AuthenticatedAppAccountingRoute
   '/app/audit': typeof AuthenticatedAppAuditRoute
@@ -213,7 +323,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_super_admin': typeof Super_adminRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/app': typeof AuthenticatedAppRouteRouteWithChildren
+  '/_super_admin/audit': typeof Super_adminAuditRoute
+  '/_super_admin/backup': typeof Super_adminBackupRoute
+  '/_super_admin/companies': typeof Super_adminCompaniesRoute
+  '/_super_admin/dashboard': typeof Super_adminDashboardRoute
+  '/_super_admin/maintenance': typeof Super_adminMaintenanceRoute
+  '/_super_admin/payments': typeof Super_adminPaymentsRoute
+  '/_super_admin/plans': typeof Super_adminPlansRoute
+  '/_super_admin/reports': typeof Super_adminReportsRoute
+  '/_super_admin/settings': typeof Super_adminSettingsRoute
+  '/_super_admin/subscriptions': typeof Super_adminSubscriptionsRoute
+  '/_super_admin/trials': typeof Super_adminTrialsRoute
+  '/_super_admin/users': typeof Super_adminUsersRoute
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/_authenticated/app/accounting': typeof AuthenticatedAppAccountingRoute
   '/_authenticated/app/audit': typeof AuthenticatedAppAuditRoute
@@ -240,6 +364,19 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/app'
+    | '/audit'
+    | '/backup'
+    | '/companies'
+    | '/dashboard'
+    | '/maintenance'
+    | '/payments'
+    | '/plans'
+    | '/reports'
+    | '/settings'
+    | '/subscriptions'
+    | '/trials'
+    | '/users'
     | '/super-admin/login'
     | '/app/accounting'
     | '/app/audit'
@@ -264,6 +401,19 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/app'
+    | '/audit'
+    | '/backup'
+    | '/companies'
+    | '/dashboard'
+    | '/maintenance'
+    | '/payments'
+    | '/plans'
+    | '/reports'
+    | '/settings'
+    | '/subscriptions'
+    | '/trials'
+    | '/users'
     | '/super-admin/login'
     | '/app/accounting'
     | '/app/audit'
@@ -288,7 +438,21 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/_super_admin'
     | '/auth'
+    | '/_authenticated/app'
+    | '/_super_admin/audit'
+    | '/_super_admin/backup'
+    | '/_super_admin/companies'
+    | '/_super_admin/dashboard'
+    | '/_super_admin/maintenance'
+    | '/_super_admin/payments'
+    | '/_super_admin/plans'
+    | '/_super_admin/reports'
+    | '/_super_admin/settings'
+    | '/_super_admin/subscriptions'
+    | '/_super_admin/trials'
+    | '/_super_admin/users'
     | '/super-admin/login'
     | '/_authenticated/app/accounting'
     | '/_authenticated/app/audit'
@@ -314,6 +478,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  Super_adminRouteRoute: typeof Super_adminRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   SuperAdminLoginRoute: typeof SuperAdminLoginRoute
 }
@@ -325,6 +490,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_super_admin': {
+      id: '/_super_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof Super_adminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -348,143 +520,234 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuperAdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_super_admin/users': {
+      id: '/_super_admin/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof Super_adminUsersRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/trials': {
+      id: '/_super_admin/trials'
+      path: '/trials'
+      fullPath: '/trials'
+      preLoaderRoute: typeof Super_adminTrialsRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/subscriptions': {
+      id: '/_super_admin/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/subscriptions'
+      preLoaderRoute: typeof Super_adminSubscriptionsRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/settings': {
+      id: '/_super_admin/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof Super_adminSettingsRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/reports': {
+      id: '/_super_admin/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof Super_adminReportsRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/plans': {
+      id: '/_super_admin/plans'
+      path: '/plans'
+      fullPath: '/plans'
+      preLoaderRoute: typeof Super_adminPlansRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/payments': {
+      id: '/_super_admin/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof Super_adminPaymentsRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/maintenance': {
+      id: '/_super_admin/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof Super_adminMaintenanceRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/dashboard': {
+      id: '/_super_admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof Super_adminDashboardRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/companies': {
+      id: '/_super_admin/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof Super_adminCompaniesRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/backup': {
+      id: '/_super_admin/backup'
+      path: '/backup'
+      fullPath: '/backup'
+      preLoaderRoute: typeof Super_adminBackupRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_super_admin/audit': {
+      id: '/_super_admin/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof Super_adminAuditRouteImport
+      parentRoute: typeof Super_adminRouteRoute
+    }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app/warehouses': {
       id: '/_authenticated/app/warehouses'
-      path: '/app/warehouses'
+      path: '/warehouses'
       fullPath: '/app/warehouses'
       preLoaderRoute: typeof AuthenticatedAppWarehousesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/team': {
       id: '/_authenticated/app/team'
-      path: '/app/team'
+      path: '/team'
       fullPath: '/app/team'
       preLoaderRoute: typeof AuthenticatedAppTeamRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/suppliers': {
       id: '/_authenticated/app/suppliers'
-      path: '/app/suppliers'
+      path: '/suppliers'
       fullPath: '/app/suppliers'
       preLoaderRoute: typeof AuthenticatedAppSuppliersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/stock': {
       id: '/_authenticated/app/stock'
-      path: '/app/stock'
+      path: '/stock'
       fullPath: '/app/stock'
       preLoaderRoute: typeof AuthenticatedAppStockRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/settings': {
       id: '/_authenticated/app/settings'
-      path: '/app/settings'
+      path: '/settings'
       fullPath: '/app/settings'
       preLoaderRoute: typeof AuthenticatedAppSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/sales': {
       id: '/_authenticated/app/sales'
-      path: '/app/sales'
+      path: '/sales'
       fullPath: '/app/sales'
       preLoaderRoute: typeof AuthenticatedAppSalesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/reports': {
       id: '/_authenticated/app/reports'
-      path: '/app/reports'
+      path: '/reports'
       fullPath: '/app/reports'
       preLoaderRoute: typeof AuthenticatedAppReportsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/quotations': {
       id: '/_authenticated/app/quotations'
-      path: '/app/quotations'
+      path: '/quotations'
       fullPath: '/app/quotations'
       preLoaderRoute: typeof AuthenticatedAppQuotationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/purchases': {
       id: '/_authenticated/app/purchases'
-      path: '/app/purchases'
+      path: '/purchases'
       fullPath: '/app/purchases'
       preLoaderRoute: typeof AuthenticatedAppPurchasesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/products': {
       id: '/_authenticated/app/products'
-      path: '/app/products'
+      path: '/products'
       fullPath: '/app/products'
       preLoaderRoute: typeof AuthenticatedAppProductsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/pos': {
       id: '/_authenticated/app/pos'
-      path: '/app/pos'
+      path: '/pos'
       fullPath: '/app/pos'
       preLoaderRoute: typeof AuthenticatedAppPosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/notifications': {
       id: '/_authenticated/app/notifications'
-      path: '/app/notifications'
+      path: '/notifications'
       fullPath: '/app/notifications'
       preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/invoices': {
       id: '/_authenticated/app/invoices'
-      path: '/app/invoices'
+      path: '/invoices'
       fullPath: '/app/invoices'
       preLoaderRoute: typeof AuthenticatedAppInvoicesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/expenses': {
       id: '/_authenticated/app/expenses'
-      path: '/app/expenses'
+      path: '/expenses'
       fullPath: '/app/expenses'
       preLoaderRoute: typeof AuthenticatedAppExpensesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/dashboard': {
       id: '/_authenticated/app/dashboard'
-      path: '/app/dashboard'
+      path: '/dashboard'
       fullPath: '/app/dashboard'
       preLoaderRoute: typeof AuthenticatedAppDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/customers': {
       id: '/_authenticated/app/customers'
-      path: '/app/customers'
+      path: '/customers'
       fullPath: '/app/customers'
       preLoaderRoute: typeof AuthenticatedAppCustomersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/companies': {
       id: '/_authenticated/app/companies'
-      path: '/app/companies'
+      path: '/companies'
       fullPath: '/app/companies'
       preLoaderRoute: typeof AuthenticatedAppCompaniesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/audit': {
       id: '/_authenticated/app/audit'
-      path: '/app/audit'
+      path: '/audit'
       fullPath: '/app/audit'
       preLoaderRoute: typeof AuthenticatedAppAuditRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
     '/_authenticated/app/accounting': {
       id: '/_authenticated/app/accounting'
-      path: '/app/accounting'
+      path: '/accounting'
       fullPath: '/app/accounting'
       preLoaderRoute: typeof AuthenticatedAppAccountingRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAppRouteRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
+interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAccountingRoute: typeof AuthenticatedAppAccountingRoute
   AuthenticatedAppAuditRoute: typeof AuthenticatedAppAuditRoute
   AuthenticatedAppCompaniesRoute: typeof AuthenticatedAppCompaniesRoute
@@ -506,7 +769,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAppWarehousesRoute: typeof AuthenticatedAppWarehousesRoute
 }
 
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAccountingRoute: AuthenticatedAppAccountingRoute,
   AuthenticatedAppAuditRoute: AuthenticatedAppAuditRoute,
   AuthenticatedAppCompaniesRoute: AuthenticatedAppCompaniesRoute,
@@ -528,12 +791,59 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAppWarehousesRoute: AuthenticatedAppWarehousesRoute,
 }
 
+const AuthenticatedAppRouteRouteWithChildren =
+  AuthenticatedAppRouteRoute._addFileChildren(
+    AuthenticatedAppRouteRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAppRouteRoute: typeof AuthenticatedAppRouteRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAppRouteRoute: AuthenticatedAppRouteRouteWithChildren,
+}
+
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface Super_adminRouteRouteChildren {
+  Super_adminAuditRoute: typeof Super_adminAuditRoute
+  Super_adminBackupRoute: typeof Super_adminBackupRoute
+  Super_adminCompaniesRoute: typeof Super_adminCompaniesRoute
+  Super_adminDashboardRoute: typeof Super_adminDashboardRoute
+  Super_adminMaintenanceRoute: typeof Super_adminMaintenanceRoute
+  Super_adminPaymentsRoute: typeof Super_adminPaymentsRoute
+  Super_adminPlansRoute: typeof Super_adminPlansRoute
+  Super_adminReportsRoute: typeof Super_adminReportsRoute
+  Super_adminSettingsRoute: typeof Super_adminSettingsRoute
+  Super_adminSubscriptionsRoute: typeof Super_adminSubscriptionsRoute
+  Super_adminTrialsRoute: typeof Super_adminTrialsRoute
+  Super_adminUsersRoute: typeof Super_adminUsersRoute
+}
+
+const Super_adminRouteRouteChildren: Super_adminRouteRouteChildren = {
+  Super_adminAuditRoute: Super_adminAuditRoute,
+  Super_adminBackupRoute: Super_adminBackupRoute,
+  Super_adminCompaniesRoute: Super_adminCompaniesRoute,
+  Super_adminDashboardRoute: Super_adminDashboardRoute,
+  Super_adminMaintenanceRoute: Super_adminMaintenanceRoute,
+  Super_adminPaymentsRoute: Super_adminPaymentsRoute,
+  Super_adminPlansRoute: Super_adminPlansRoute,
+  Super_adminReportsRoute: Super_adminReportsRoute,
+  Super_adminSettingsRoute: Super_adminSettingsRoute,
+  Super_adminSubscriptionsRoute: Super_adminSubscriptionsRoute,
+  Super_adminTrialsRoute: Super_adminTrialsRoute,
+  Super_adminUsersRoute: Super_adminUsersRoute,
+}
+
+const Super_adminRouteRouteWithChildren =
+  Super_adminRouteRoute._addFileChildren(Super_adminRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  Super_adminRouteRoute: Super_adminRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   SuperAdminLoginRoute: SuperAdminLoginRoute,
 }
