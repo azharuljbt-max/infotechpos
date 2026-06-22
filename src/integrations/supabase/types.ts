@@ -429,6 +429,63 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          category: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          is_archived: boolean
+          is_read: boolean
+          link: string | null
+          message: string | null
+          metadata: Json | null
+          read_at: string | null
+          severity: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          link?: string | null
+          message?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          severity?: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_archived?: boolean
+          is_read?: boolean
+          link?: string | null
+          message?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          severity?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           barcode: string | null
