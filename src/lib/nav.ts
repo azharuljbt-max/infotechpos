@@ -1,8 +1,9 @@
 import {
   LayoutDashboard, ShoppingCart, Package, Boxes, Truck, Receipt, Users, Building2,
   FileText, FileSignature, Wallet, BarChart3, Calculator, Bell, Settings, ShieldCheck,
-  ClipboardList, BadgePercent,
+  ClipboardList, BadgePercent, Sparkles,
 } from "lucide-react";
+
 
 export type NavItem = { label: string; to: string; icon: any };
 export type NavGroup = { label: string; items: NavItem[] };
