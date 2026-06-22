@@ -252,7 +252,7 @@ function DashboardPage() {
                   <tr key={p.name} className="border-b border-border last:border-0">
                     <td className="px-3 py-2">{p.name}</td>
                     <td className="px-3 py-2 text-right text-muted-foreground">{p.sold}</td>
-                    <td className="px-3 py-2 text-right font-medium">{p.revenue}</td>
+                    <td className="px-3 py-2 text-right font-medium">{fmtMoney(p.revenue)}</td>
                   </tr>
                 ))}
               </tbody>
