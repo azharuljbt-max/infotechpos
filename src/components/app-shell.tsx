@@ -32,7 +32,28 @@ export function AppShell() {
     },
   });
 
+  const { data: isCompanyLoginUser = false } = useQuery({
+    queryKey: ["is-company-login-user"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return false;
+      const { data } = await (supabase.from("user_roles" as any) as any)
+        .select("owner_id,user_id")
+        .eq("user_id", u.user.id)
+        .neq("owner_id", u.user.id)
+        .limit(1)
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
+  const navGroups = isCompanyLoginUser
+    ? NAV.map((g) => ({ ...g, items: g.items.filter((i) => i.to !== "/saas") }))
+        .filter((g) => g.items.length > 0)
+    : NAV;
+
   const lang = (settings?.language as "en" | "bn") ?? "en";
+
 
   const toggleLang = useMutation({
     mutationFn: async () => {
