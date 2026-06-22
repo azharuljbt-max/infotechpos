@@ -238,8 +238,8 @@ function POSPage() {
 
       return { sale, receipt_no, invoice_no };
     },
-    onSuccess: ({ receipt_no }) => {
-      toast.success(`Sale ${receipt_no} completed`);
+    onSuccess: ({ receipt_no, invoice_no }) => {
+      toast.success(`Sale ${receipt_no} completed • Invoice ${invoice_no} created`);
       setReceipt({
         receipt_no,
         items: cart,
@@ -251,6 +251,7 @@ function POSPage() {
       setPayOpen(false);
       qc.invalidateQueries({ queryKey: ["pos-products"] });
       qc.invalidateQueries({ queryKey: ["products"] });
+      qc.invalidateQueries({ queryKey: ["invoices"] });
     },
     onError: (e: Error) => toast.error(e.message),
   });
