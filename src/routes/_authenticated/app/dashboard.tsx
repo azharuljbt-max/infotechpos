@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowUpRight, ArrowDownRight, TrendingUp, ShoppingCart, Wallet, Receipt,
-  Package, AlertTriangle, Plus,
+  AlertTriangle, Plus,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   BarChart, Bar, Legend,
 } from "recharts";
 import { useCurrency } from "@/lib/currency";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/dashboard")({
   component: DashboardPage,
@@ -32,16 +34,47 @@ const ie = [
   { m: "Oct", income: 580, expense: 360 }, { m: "Nov", income: 640, expense: 400 },
 ];
 
+function todayRange() {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const end = new Date(start); end.setDate(end.getDate() + 1);
+  return { startIso: start.toISOString(), endIso: end.toISOString(), today: start.toISOString().slice(0, 10) };
+}
 
 function DashboardPage() {
   const { symbol: sym } = useCurrency();
-  const fmtMoney = (n: number) => `${sym} ${n.toLocaleString()}`;
+  const fmtMoney = (n: number) => `${sym} ${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
+
+  const { data: totals } = useQuery({
+    queryKey: ["dashboard-today-totals"],
+    queryFn: async () => {
+      const { startIso, endIso, today } = todayRange();
+      const [salesRes, purchasesRes, expensesRes] = await Promise.all([
+        supabase.from("sales").select("total").gte("created_at", startIso).lt("created_at", endIso),
+        supabase.from("purchases").select("total").gte("created_at", startIso).lt("created_at", endIso),
+        supabase.from("expenses").select("amount").eq("expense_date", today),
+      ]);
+      const sum = (rows: any[] | null, key: string) =>
+        (rows ?? []).reduce((a, r) => a + Number(r[key] ?? 0), 0);
+      const sales = sum(salesRes.data, "total");
+      const purchase = sum(purchasesRes.data, "total");
+      const expense = sum(expensesRes.data, "amount");
+      return { sales, purchase, expense, profit: sales - purchase - expense };
+    },
+  });
+
+  const sales = totals?.sales ?? 0;
+  const purchase = totals?.purchase ?? 0;
+  const expense = totals?.expense ?? 0;
+  const profit = totals?.profit ?? 0;
+  const margin = sales > 0 ? Math.round((profit / sales) * 100) : 0;
+
   const kpis = [
-    { label: "Today's Sales", value: fmtMoney(128400), delta: "+12.4%", up: true, icon: ShoppingCart, hint: "vs yesterday", tint: "bg-chart-1/15 text-chart-1 ring-chart-1/20" },
-    { label: "Today's Purchase", value: fmtMoney(64200), delta: "+3.1%", up: true, icon: Receipt, hint: "vs yesterday", tint: "bg-chart-2/15 text-chart-2 ring-chart-2/20" },
-    { label: "Today's Expense", value: fmtMoney(18750), delta: "-5.2%", up: false, icon: Wallet, hint: "vs yesterday", tint: "bg-chart-4/15 text-chart-4 ring-chart-4/20" },
-    { label: "Today's Profit", value: fmtMoney(45450), delta: "+22.8%", up: true, icon: TrendingUp, hint: "net margin 35%", tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
+    { label: "Today's Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: "since midnight", tint: "bg-chart-1/15 text-chart-1 ring-chart-1/20" },
+    { label: "Today's Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: "since midnight", tint: "bg-chart-2/15 text-chart-2 ring-chart-2/20" },
+    { label: "Today's Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: "since midnight", tint: "bg-chart-4/15 text-chart-4 ring-chart-4/20" },
+    { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`, tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
   ];
+
   const topProducts = [
     { name: "iPhone 15 Pro 256GB", sold: 142, revenue: fmtMoney(19880000) },
     { name: "Samsung Galaxy S24", sold: 98, revenue: fmtMoney(10780000) },
@@ -90,10 +123,12 @@ function DashboardPage() {
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 text-xs">
-                <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
-                  {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                  {k.delta}
-                </span>
+                {k.delta && (
+                  <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                    {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                    {k.delta}
+                  </span>
+                )}
                 <span className="text-muted-foreground">{k.hint}</span>
               </div>
             </Card>
