@@ -66,8 +66,8 @@ function AuthPage() {
       {/* Brand panel */}
       <div className="relative hidden lg:flex flex-col justify-between p-10 bg-sidebar border-r border-sidebar-border">
         <div className="flex items-center gap-2 font-semibold">
-          <img src={logo} alt="Nexus ERP" className="h-8 w-8 rounded-md object-contain" />
-          <span className="tracking-tight">Nexus ERP</span>
+          <img src={logo} alt="Infotech ERP" className="h-8 w-8 rounded-md object-contain" />
+          <span className="tracking-tight">Infotech ERP</span>
         </div>
         <div>
           <h1 className="text-3xl font-semibold tracking-tight max-w-md">
@@ -84,15 +84,15 @@ function AuthPage() {
             ))}
           </div>
         </div>
-        <div className="text-xs text-muted-foreground">© {new Date().getFullYear()} Nexus ERP</div>
+        <div className="text-xs text-muted-foreground">© {new Date().getFullYear()} Infotech ERP</div>
       </div>
 
       {/* Form panel */}
       <div className="flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-6 flex items-center gap-2 font-semibold">
-            <img src={logo} alt="Nexus ERP" className="h-8 w-8 rounded-md object-contain" />
-            <span>Nexus ERP</span>
+            <img src={logo} alt="Infotech ERP" className="h-8 w-8 rounded-md object-contain" />
+            <span>Infotech ERP</span>
           </div>
           <h2 className="text-2xl font-semibold tracking-tight">
             {mode === "signin" ? "Welcome back" : "Create your account"}

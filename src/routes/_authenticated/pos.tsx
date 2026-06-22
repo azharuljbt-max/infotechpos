@@ -488,7 +488,7 @@ function POSPage() {
           {receipt && (
             <div id="receipt-print" className="space-y-3 rounded-md border border-border p-4 text-sm">
               <div className="text-center">
-                <div className="font-semibold">Nexus ERP</div>
+                <div className="font-semibold">Infotech ERP</div>
                 <div className="text-xs text-muted-foreground">{receipt.date}</div>
                 {receipt.customer && <div className="text-xs">Customer: {receipt.customer}</div>}
               </div>

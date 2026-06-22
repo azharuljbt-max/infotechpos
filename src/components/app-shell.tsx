@@ -63,8 +63,8 @@ export function AppShell() {
       >
         <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
           <Link to="/dashboard" className="flex items-center gap-2 font-semibold tracking-tight">
-            <img src={logo} alt="Nexus ERP" className="h-7 w-7 rounded-md object-contain" />
-            <span>Nexus ERP</span>
+            <img src={logo} alt="Infotech ERP" className="h-7 w-7 rounded-md object-contain" />
+            <span>Infotech ERP</span>
           </Link>
           <button className="lg:hidden text-sidebar-foreground" onClick={() => setMobileOpen(false)}>
             <X className="h-4 w-4" />
