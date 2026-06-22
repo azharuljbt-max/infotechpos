@@ -868,3 +868,97 @@ function PasswordsDialog({ open, onOpenChange }: { open: boolean; onOpenChange: 
     </Dialog>
   );
 }
+
+function CompanyLoginDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  const qc = useQueryClient();
+  const [form, setForm] = useState(empty);
+  const [done, setDone] = useState<{ email: string; existed: boolean } | null>(null);
+  const createLogin = useServerFn(createCompanyUser);
+
+  const reset = () => { setForm(empty); setDone(null); };
+
+  const strength = evaluatePassword(form.login_password);
+  const match = form.login_password.length > 0 && form.login_password === form.login_password_confirm;
+  const canSubmit = !!form.login_email && strength.valid && match;
+
+  const mutate = useMutation({
+    mutationFn: async () => {
+      if (!form.login_email) throw new Error("Login email is required");
+      if (!strength.valid) throw new Error("Password does not meet all requirements");
+      if (!match) throw new Error("Passwords do not match");
+      const res = await createLogin({
+        data: {
+          email: form.login_email.trim(),
+          password: form.login_password,
+          confirmPassword: form.login_password_confirm,
+          fullName: form.login_full_name.trim(),
+          role: form.login_role,
+          branch: form.login_branch.trim(),
+        },
+      });
+      return res;
+    },
+    onSuccess: async (res) => {
+      await logAudit({
+        module: "team",
+        action: res.existed ? "login.reset" : "login.create",
+        entity_type: "user",
+        entity_id: res.userId,
+        description: `${res.existed ? "Reset password for" : "Created company login for"} ${res.email}`,
+        severity: "warning",
+      });
+      toast.success(res.existed ? "Login password reset" : "Company login created");
+      qc.invalidateQueries({ queryKey: ["team-members-for-pw"] });
+      setDone({ email: res.email, existed: res.existed });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <KeyRound className="h-4 w-4 text-primary" />
+            Company login
+          </DialogTitle>
+          <DialogDescription>
+            Create a sign-in for a company user. If the email already exists, its password will be reset and the user added to your workspace.
+          </DialogDescription>
+        </DialogHeader>
+
+        {done ? (
+          <div className="space-y-3 py-2">
+            <div className="flex items-start gap-3 rounded-md border border-success/30 bg-success/10 p-3 text-sm">
+              <Check className="mt-0.5 h-4 w-4 text-success" />
+              <div>
+                <div className="font-medium">{done.existed ? "Password reset" : "Login created"}</div>
+                <div className="text-xs text-muted-foreground">
+                  {done.email} can now sign in with the new password. Share it through a secure channel — it is not stored or sent by email.
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={reset}>Add another</Button>
+              <Button onClick={() => { reset(); onOpenChange(false); }}>Done</Button>
+            </DialogFooter>
+          </div>
+        ) : (
+          <>
+            <div className="max-h-[60vh] overflow-y-auto pr-2">
+              <CompanyLoginFields form={form} setForm={setForm} />
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => onOpenChange(false)} disabled={mutate.isPending}>Cancel</Button>
+              <Button onClick={() => mutate.mutate()} disabled={!canSubmit || mutate.isPending}>
+                {mutate.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                {mutate.isPending ? "Saving…" : "Create login"}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
