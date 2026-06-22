@@ -46,6 +46,7 @@ type Company = {
   status: string;
   trial_ends_at: string | null;
   is_default: boolean;
+  default_user_id: string | null;
   notes: string | null;
 };
 
@@ -58,7 +59,7 @@ const empty = {
   email: "", phone: "", address: "", tax_id: "", website: "",
   currency: "USD", logo_url: "",
   plan: "trial", status: "active",
-  trial_ends_at: "", is_default: false, notes: "",
+  trial_ends_at: "", is_default: false, default_user_id: "", notes: "",
   // Login access (only used when creating a new company)
   create_login: false,
   login_full_name: "",
@@ -103,7 +104,24 @@ function CompaniesPage() {
     paid: items.filter((c) => c.plan !== "trial").length,
   }), [items]);
 
+  const { data: teamMembers = [] } = useQuery({
+    queryKey: ["team-members-for-pw"],
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return [];
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("user_id, email, full_name, role, is_active")
+        .eq("owner_id", u.user.id)
+        .not("user_id", "is", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as Array<{ user_id: string; email: string; full_name: string | null; role: string; is_active: boolean }>;
+    },
+  });
+
   const createLoginFn = useServerFn(createCompanyUser);
+
 
   const save = useMutation({
     mutationFn: async (f: typeof empty) => {
@@ -140,6 +158,7 @@ function CompaniesPage() {
         status: f.status,
         trial_ends_at: f.trial_ends_at || null,
         is_default: f.is_default,
+        default_user_id: f.default_user_id || null,
         notes: f.notes || null,
       };
       if (f.id) {
@@ -316,7 +335,7 @@ function CompaniesPage() {
                             currency: c.currency, logo_url: c.logo_url ?? "",
                             plan: c.plan, status: c.status,
                             trial_ends_at: c.trial_ends_at ?? "",
-                            is_default: c.is_default, notes: c.notes ?? "",
+                            is_default: c.is_default, default_user_id: c.default_user_id ?? "", notes: c.notes ?? "",
                           });
                           setOpen(true);
                         }}>
@@ -415,6 +434,25 @@ function CompaniesPage() {
                 className="h-4 w-4 rounded border-border"
               />
               <Label htmlFor="is_default" className="cursor-pointer">Set as default workspace</Label>
+            </div>
+            <div className="col-span-2">
+              <Label>Default user</Label>
+              <Select
+                value={form.default_user_id || "__none__"}
+                onValueChange={(v) => setForm({ ...form, default_user_id: v === "__none__" ? "" : v })}
+              >
+                <SelectTrigger><SelectValue placeholder="No default user" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">No default user</SelectItem>
+                  {teamMembers.filter((m) => m.is_active).map((m) => (
+                    <SelectItem key={m.user_id} value={m.user_id}>
+                      {m.full_name || m.email}
+                      <span className="ml-1 text-xs text-muted-foreground">· {m.role}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="mt-1 text-xs text-muted-foreground">Used as the default operator for this company's sales, POS and quotations.</p>
             </div>
             <div className="col-span-2">
               <Label>Notes</Label>
