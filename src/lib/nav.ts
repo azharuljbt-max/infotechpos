@@ -1,9 +1,8 @@
 import {
   LayoutDashboard, ShoppingCart, Package, Boxes, Truck, Receipt, Users, Building2,
   FileText, FileSignature, Wallet, BarChart3, Calculator, Bell, Settings, ShieldCheck,
-  ClipboardList, BadgePercent, Sparkles,
+  ClipboardList, BadgePercent,
 } from "lucide-react";
-
 
 export type NavItem = { label: string; to: string; icon: any };
 export type NavGroup = { label: string; items: NavItem[] };
@@ -12,52 +11,50 @@ export const NAV: NavGroup[] = [
   {
     label: "Overview",
     items: [
-      { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
-      { label: "POS", to: "/pos", icon: ShoppingCart },
+      { label: "Dashboard", to: "/app/dashboard", icon: LayoutDashboard },
+      { label: "POS", to: "/app/pos", icon: ShoppingCart },
     ],
   },
   {
     label: "Inventory",
     items: [
-      { label: "Products", to: "/products", icon: Package },
-      { label: "Stock", to: "/stock", icon: Boxes },
-      { label: "Warehouses", to: "/warehouses", icon: Building2 },
+      { label: "Products", to: "/app/products", icon: Package },
+      { label: "Stock", to: "/app/stock", icon: Boxes },
+      { label: "Warehouses", to: "/app/warehouses", icon: Building2 },
     ],
   },
   {
     label: "Operations",
     items: [
-      { label: "Sales", to: "/sales", icon: BadgePercent },
-      { label: "Purchases", to: "/purchases", icon: Truck },
-      { label: "Invoices", to: "/invoices", icon: Receipt },
-      { label: "Quotations", to: "/quotations", icon: FileSignature },
-      { label: "Expenses", to: "/expenses", icon: Wallet },
+      { label: "Sales", to: "/app/sales", icon: BadgePercent },
+      { label: "Purchases", to: "/app/purchases", icon: Truck },
+      { label: "Invoices", to: "/app/invoices", icon: Receipt },
+      { label: "Quotations", to: "/app/quotations", icon: FileSignature },
+      { label: "Expenses", to: "/app/expenses", icon: Wallet },
     ],
   },
   {
     label: "Contacts",
     items: [
-      { label: "Customers", to: "/customers", icon: Users },
-      { label: "Suppliers", to: "/suppliers", icon: Truck },
+      { label: "Customers", to: "/app/customers", icon: Users },
+      { label: "Suppliers", to: "/app/suppliers", icon: Truck },
     ],
   },
   {
     label: "Insights",
     items: [
-      { label: "Reports", to: "/reports", icon: BarChart3 },
-      { label: "Accounting", to: "/accounting", icon: Calculator },
-      { label: "Audit Log", to: "/audit", icon: ClipboardList },
+      { label: "Reports", to: "/app/reports", icon: BarChart3 },
+      { label: "Accounting", to: "/app/accounting", icon: Calculator },
+      { label: "Audit Log", to: "/app/audit", icon: ClipboardList },
     ],
   },
   {
     label: "System",
     items: [
-      { label: "Team & Roles", to: "/team", icon: ShieldCheck },
-      { label: "Notifications", to: "/notifications", icon: Bell },
-      { label: "Settings", to: "/settings", icon: Settings },
-      { label: "Companies", to: "/companies", icon: FileText },
-      { label: "SaaS", to: "/saas", icon: Sparkles },
+      { label: "Team & Roles", to: "/app/team", icon: ShieldCheck },
+      { label: "Notifications", to: "/app/notifications", icon: Bell },
+      { label: "Settings", to: "/app/settings", icon: Settings },
+      { label: "Companies", to: "/app/companies", icon: FileText },
     ],
   },
 ];
-
