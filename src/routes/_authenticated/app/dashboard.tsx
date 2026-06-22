@@ -123,10 +123,12 @@ function DashboardPage() {
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 text-xs">
-                <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
-                  {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-                  {k.delta}
-                </span>
+                {k.delta && (
+                  <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                    {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                    {k.delta}
+                  </span>
+                )}
                 <span className="text-muted-foreground">{k.hint}</span>
               </div>
             </Card>
