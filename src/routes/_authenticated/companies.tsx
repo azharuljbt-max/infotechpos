@@ -46,6 +46,7 @@ type Company = {
   status: string;
   trial_ends_at: string | null;
   is_default: boolean;
+  default_user_id: string | null;
   notes: string | null;
 };
 
