@@ -276,6 +276,7 @@ function CompaniesPage() {
                         )}
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => {
                           setForm({
+                            ...empty,
                             id: c.id, name: c.name, legal_name: c.legal_name ?? "",
                             industry: c.industry ?? "Retail", email: c.email ?? "",
                             phone: c.phone ?? "", address: c.address ?? "",
