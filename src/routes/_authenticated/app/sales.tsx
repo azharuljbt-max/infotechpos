@@ -245,8 +245,11 @@ function SalesPage() {
                 <TableCell><Badge variant={s.status === "completed" ? "default" : "secondary"}>{s.status}</Badge></TableCell>
                 <TableCell>
                   <div className="flex justify-end gap-1">
-                    <Button size="icon" variant="ghost" onClick={() => setViewId(s.id)}><Eye className="h-3.5 w-3.5" /></Button>
-                    <Button size="icon" variant="ghost" onClick={() => { if (confirm(`Delete ${s.receipt_no}?`)) del.mutate(s.id); }}>
+                    <Button size="icon" variant="ghost" title="View" onClick={() => setViewId(s.id)}><Eye className="h-3.5 w-3.5" /></Button>
+                    <Button size="icon" variant="ghost" title="Generate Invoice" disabled={genInvoice.isPending} onClick={() => genInvoice.mutate(s)}>
+                      <FileText className="h-3.5 w-3.5 text-blue-500" />
+                    </Button>
+                    <Button size="icon" variant="ghost" title="Delete" onClick={() => { if (confirm(`Delete ${s.receipt_no}?`)) del.mutate(s.id); }}>
                       <Trash2 className="h-3.5 w-3.5 text-destructive" />
                     </Button>
                   </div>
