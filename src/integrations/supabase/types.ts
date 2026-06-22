@@ -53,6 +53,60 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          description: string | null
+          device: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          ip_address: string | null
+          module: string
+          severity: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          description?: string | null
+          device?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          module: string
+          severity?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          description?: string | null
+          device?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          ip_address?: string | null
+          module?: string
+          severity?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           address: string | null
