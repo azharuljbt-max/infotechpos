@@ -137,6 +137,58 @@ function DashboardPage() {
     },
   });
 
+  const { data: monthly = [] } = useQuery({
+    queryKey: ["dashboard-monthly-sales-purchase"],
+    queryFn: async () => {
+      const buckets = monthBuckets(12);
+      const start = new Date(buckets[0].year, buckets[0].month, 1).toISOString();
+      const [salesRes, purchasesRes] = await Promise.all([
+        supabase.from("sales").select("total, created_at").gte("created_at", start),
+        supabase.from("purchases").select("total, created_at").gte("created_at", start),
+      ]);
+      const init = buckets.map((b) => ({ m: b.m, key: b.key, sales: 0, purchase: 0 }));
+      const idx = new Map(init.map((r, i) => [r.key, i]));
+      for (const r of salesRes.data ?? []) {
+        const d = new Date(r.created_at as string);
+        const i = idx.get(`${d.getFullYear()}-${d.getMonth()}`);
+        if (i !== undefined) init[i].sales += Number(r.total ?? 0);
+      }
+      for (const r of purchasesRes.data ?? []) {
+        const d = new Date(r.created_at as string);
+        const i = idx.get(`${d.getFullYear()}-${d.getMonth()}`);
+        if (i !== undefined) init[i].purchase += Number(r.total ?? 0);
+      }
+      return init;
+    },
+  });
+
+  const { data: ie = [] } = useQuery({
+    queryKey: ["dashboard-income-expense"],
+    queryFn: async () => {
+      const buckets = monthBuckets(6);
+      const start = new Date(buckets[0].year, buckets[0].month, 1);
+      const startIso = start.toISOString();
+      const startDate = startIso.slice(0, 10);
+      const [salesRes, expensesRes] = await Promise.all([
+        supabase.from("sales").select("total, created_at").gte("created_at", startIso),
+        supabase.from("expenses").select("amount, expense_date").gte("expense_date", startDate),
+      ]);
+      const init = buckets.map((b) => ({ m: b.m, key: b.key, income: 0, expense: 0 }));
+      const idx = new Map(init.map((r, i) => [r.key, i]));
+      for (const r of salesRes.data ?? []) {
+        const d = new Date(r.created_at as string);
+        const i = idx.get(`${d.getFullYear()}-${d.getMonth()}`);
+        if (i !== undefined) init[i].income += Number(r.total ?? 0);
+      }
+      for (const r of expensesRes.data ?? []) {
+        const d = new Date(r.expense_date as string);
+        const i = idx.get(`${d.getFullYear()}-${d.getMonth()}`);
+        if (i !== undefined) init[i].expense += Number(r.amount ?? 0);
+      }
+      return init;
+    },
+  });
+
   return (
     <>
       <PageHeader
