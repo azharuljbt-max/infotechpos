@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          code: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          opening_balance: number
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          opening_balance?: number
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          opening_balance?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       companies: {
         Row: {
           address: string | null
@@ -279,6 +318,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          account_id: string | null
+          account_name: string | null
+          created_at: string
+          credit: number
+          debit: number
+          description: string | null
+          entry_date: string
+          id: string
+          notes: string | null
+          reference: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          account_name?: string | null
+          created_at?: string
+          credit?: number
+          debit?: number
+          description?: string | null
+          entry_date?: string
+          id?: string
+          notes?: string | null
+          reference?: string | null
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          account_name?: string | null
+          created_at?: string
+          credit?: number
+          debit?: number
+          description?: string | null
+          entry_date?: string
+          id?: string
+          notes?: string | null
+          reference?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_entries_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
