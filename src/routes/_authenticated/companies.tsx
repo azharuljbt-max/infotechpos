@@ -77,7 +77,9 @@ function CompaniesPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(empty);
   const [pwOpen, setPwOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const editing = !!form.id;
+
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["companies"],
