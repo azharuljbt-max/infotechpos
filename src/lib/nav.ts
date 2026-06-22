@@ -54,7 +54,6 @@ export const NAV: NavGroup[] = [
       { label: "Team & Roles", to: "/app/team", icon: ShieldCheck },
       { label: "Notifications", to: "/app/notifications", icon: Bell },
       { label: "Settings", to: "/app/settings", icon: Settings },
-      { label: "Companies", to: "/app/companies", icon: FileText },
     ],
   },
 ];
