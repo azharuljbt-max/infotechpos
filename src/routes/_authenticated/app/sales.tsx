@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { BadgePercent, Search, Eye, Trash2, Receipt, Plus, TrendingUp, DollarSign, ShoppingCart } from "lucide-react";
+import { BadgePercent, Search, Eye, Trash2, Receipt, Plus, TrendingUp, DollarSign, ShoppingCart, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app-shell";
