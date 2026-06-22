@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 import { PageHeader } from "@/components/app-shell";
 import { supabase } from "@/integrations/supabase/client";
-import { setTeamUserPassword } from "@/lib/team-admin.functions";
+import { setTeamUserPassword, createCompanyUser } from "@/lib/team-admin.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,6 +59,14 @@ const empty = {
   currency: "USD", logo_url: "",
   plan: "trial", status: "active",
   trial_ends_at: "", is_default: false, notes: "",
+  // Login access (only used when creating a new company)
+  create_login: false,
+  login_full_name: "",
+  login_email: "",
+  login_password: "",
+  login_password_confirm: "",
+  login_role: "admin" as "admin" | "manager" | "staff" | "viewer",
+  login_branch: "",
 };
 
 function CompaniesPage() {
@@ -95,13 +103,23 @@ function CompaniesPage() {
     paid: items.filter((c) => c.plan !== "trial").length,
   }), [items]);
 
+  const createLoginFn = useServerFn(createCompanyUser);
+
   const save = useMutation({
     mutationFn: async (f: typeof empty) => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) throw new Error("Not signed in");
       if (!f.name) throw new Error("Company name required");
 
-      // If marking default, clear other defaults first
+      // Validate login fields up-front when creating a new company with login enabled.
+      const wantLogin = !f.id && f.create_login;
+      if (wantLogin) {
+        if (!f.login_email) throw new Error("Login email is required");
+        const s = evaluatePassword(f.login_password);
+        if (!s.valid) throw new Error("Login password does not meet all requirements");
+        if (f.login_password !== f.login_password_confirm) throw new Error("Login passwords do not match");
+      }
+
       if (f.is_default) {
         await supabase.from("companies").update({ is_default: false }).eq("user_id", u.user.id);
       }
@@ -131,10 +149,32 @@ function CompaniesPage() {
         const { error } = await supabase.from("companies").insert(payload);
         if (error) throw error;
       }
+
+      if (wantLogin) {
+        await createLoginFn({
+          data: {
+            email: f.login_email.trim(),
+            password: f.login_password,
+            confirmPassword: f.login_password_confirm,
+            fullName: f.login_full_name.trim(),
+            role: f.login_role,
+            branch: f.login_branch.trim(),
+          },
+        });
+      }
+
+      return { createdLogin: wantLogin };
     },
-    onSuccess: () => {
-      toast.success(editing ? "Company updated" : "Company added");
+    onSuccess: (res) => {
+      toast.success(
+        editing
+          ? "Company updated"
+          : res?.createdLogin
+            ? "Company added and login created"
+            : "Company added",
+      );
       qc.invalidateQueries({ queryKey: ["companies"] });
+      qc.invalidateQueries({ queryKey: ["team-members-for-pw"] });
       setOpen(false); setForm(empty);
     },
     onError: (e: Error) => toast.error(e.message),
@@ -268,6 +308,7 @@ function CompaniesPage() {
                         )}
                         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => {
                           setForm({
+                            ...empty,
                             id: c.id, name: c.name, legal_name: c.legal_name ?? "",
                             industry: c.industry ?? "Retail", email: c.email ?? "",
                             phone: c.phone ?? "", address: c.address ?? "",
@@ -379,6 +420,27 @@ function CompaniesPage() {
               <Label>Notes</Label>
               <Textarea rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </div>
+
+            {!editing && (
+              <div className="col-span-2 rounded-md border border-border p-3 space-y-3">
+                <div className="flex items-center gap-2">
+                  <input
+                    id="create_login"
+                    type="checkbox"
+                    checked={form.create_login}
+                    onChange={(e) => setForm({ ...form, create_login: e.target.checked })}
+                    className="h-4 w-4 rounded border-border"
+                  />
+                  <Label htmlFor="create_login" className="cursor-pointer flex items-center gap-1.5">
+                    <KeyRound className="h-3.5 w-3.5 text-primary" />
+                    Create a sign-in for this company
+                  </Label>
+                </div>
+                {form.create_login && (
+                  <CompanyLoginFields form={form} setForm={setForm} />
+                )}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
@@ -398,6 +460,132 @@ function Stat({ label, value }: { label: string; value: string }) {
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="mt-1 text-2xl font-semibold tracking-tight tabular-nums">{value}</div>
     </Card>
+  );
+}
+
+function CompanyLoginFields({
+  form,
+  setForm,
+}: {
+  form: typeof empty;
+  setForm: (f: typeof empty) => void;
+}) {
+  const [show, setShow] = useState(false);
+  const strength = evaluatePassword(form.login_password);
+  const match =
+    form.login_password.length > 0 && form.login_password === form.login_password_confirm;
+
+  const meterColor =
+    strength.score >= 6 ? "bg-success"
+    : strength.score >= 5 ? "bg-success/80"
+    : strength.score >= 4 ? "bg-warning"
+    : strength.score >= 2 ? "bg-warning/70"
+    : "bg-destructive";
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <div>
+        <Label>Full name</Label>
+        <Input
+          value={form.login_full_name}
+          onChange={(e) => setForm({ ...form, login_full_name: e.target.value })}
+          placeholder="Jane Doe"
+        />
+      </div>
+      <div>
+        <Label>Login email *</Label>
+        <Input
+          type="email"
+          value={form.login_email}
+          onChange={(e) => setForm({ ...form, login_email: e.target.value })}
+          placeholder="user@company.com"
+          autoComplete="off"
+        />
+      </div>
+      <div>
+        <Label>Role</Label>
+        <Select
+          value={form.login_role}
+          onValueChange={(v) => setForm({ ...form, login_role: v as typeof form.login_role })}
+        >
+          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="manager">Manager</SelectItem>
+            <SelectItem value="staff">Staff</SelectItem>
+            <SelectItem value="viewer">Viewer</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label>Branch</Label>
+        <Input
+          value={form.login_branch}
+          onChange={(e) => setForm({ ...form, login_branch: e.target.value })}
+          placeholder="Optional"
+        />
+      </div>
+      <div className="col-span-2">
+        <Label>Password *</Label>
+        <div className="relative">
+          <Input
+            type={show ? "text" : "password"}
+            value={form.login_password}
+            onChange={(e) => setForm({ ...form, login_password: e.target.value })}
+            placeholder="Create a strong password"
+            autoComplete="new-password"
+            className="pr-9"
+          />
+          <button
+            type="button"
+            onClick={() => setShow((s) => !s)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            tabIndex={-1}
+            aria-label={show ? "Hide password" : "Show password"}
+          >
+            {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+        <div className="mt-2 space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+              <div
+                className={`h-full transition-all ${meterColor}`}
+                style={{ width: `${(strength.score / strength.max) * 100}%` }}
+              />
+            </div>
+            <span className="w-16 text-right text-xs font-medium text-muted-foreground">
+              {form.login_password ? strength.label : "—"}
+            </span>
+          </div>
+          <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+            {PASSWORD_RULES.map((r) => {
+              const ok = strength.passed.has(r.id);
+              return (
+                <li key={r.id} className={`flex items-center gap-1.5 ${ok ? "text-success" : "text-muted-foreground"}`}>
+                  {ok ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                  {r.label}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+      <div className="col-span-2">
+        <Label>Confirm password *</Label>
+        <Input
+          type={show ? "text" : "password"}
+          value={form.login_password_confirm}
+          onChange={(e) => setForm({ ...form, login_password_confirm: e.target.value })}
+          placeholder="Re-enter the password"
+          autoComplete="new-password"
+          aria-invalid={form.login_password_confirm.length > 0 && !match}
+        />
+        {form.login_password_confirm.length > 0 && !match && (
+          <p className="mt-1 text-xs text-destructive">Passwords do not match.</p>
+        )}
+      </div>
+    </div>
   );
 }
 

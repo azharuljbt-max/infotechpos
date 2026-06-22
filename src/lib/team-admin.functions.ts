@@ -30,12 +30,10 @@ export const setTeamUserPassword = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    // Caller must not target themselves through this admin path.
     if (data.targetUserId === userId) {
       throw new Error("Use account settings to change your own password");
     }
 
-    // Verify the target user belongs to the caller's workspace.
     const { data: roleRow, error: roleErr } = await supabase
       .from("user_roles")
       .select("id, owner_id, user_id, email, is_active")
@@ -48,7 +46,6 @@ export const setTeamUserPassword = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Re-confirm by matching the target user's auth email against the typed confirmation.
     const { data: target, error: getErr } = await supabaseAdmin.auth.admin.getUserById(
       data.targetUserId,
     );
@@ -66,4 +63,94 @@ export const setTeamUserPassword = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     return { ok: true, email: targetEmail };
+  });
+
+const createCompanyUserSchema = z
+  .object({
+    email: z.string().email().max(255),
+    password: strongPassword,
+    confirmPassword: z.string(),
+    fullName: z.string().trim().max(120).optional().default(""),
+    role: z.enum(["admin", "manager", "staff", "viewer"]).default("admin"),
+    branch: z.string().trim().max(120).optional().default(""),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export const createCompanyUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => createCompanyUserSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const email = data.email.toLowerCase().trim();
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Try to find an existing auth user with this email.
+    let targetUserId: string | null = null;
+    const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
+      page: 1,
+      perPage: 200,
+    });
+    if (listErr) throw new Error(listErr.message);
+    const existing = list?.users?.find(
+      (u) => (u.email ?? "").toLowerCase() === email,
+    );
+
+    if (existing) {
+      targetUserId = existing.id;
+      // Reset password on the existing user so the company owner can hand it over.
+      const { error: updErr } = await supabaseAdmin.auth.admin.updateUserById(existing.id, {
+        password: data.password,
+      });
+      if (updErr) throw new Error(updErr.message);
+    } else {
+      const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password: data.password,
+        email_confirm: true,
+        user_metadata: data.fullName ? { full_name: data.fullName } : undefined,
+      });
+      if (createErr || !created?.user) throw new Error(createErr?.message || "Failed to create user");
+      targetUserId = created.user.id;
+    }
+
+    if (!targetUserId) throw new Error("No target user");
+
+    // Upsert workspace membership.
+    const { data: existingRole } = await supabase
+      .from("user_roles")
+      .select("id")
+      .eq("owner_id", userId)
+      .eq("user_id", targetUserId)
+      .maybeSingle();
+
+    if (existingRole) {
+      const { error: upErr } = await supabase
+        .from("user_roles")
+        .update({
+          email,
+          full_name: data.fullName || null,
+          role: data.role,
+          branch: data.branch || null,
+          is_active: true,
+        })
+        .eq("id", existingRole.id);
+      if (upErr) throw new Error(upErr.message);
+    } else {
+      const { error: insErr } = await supabase.from("user_roles").insert({
+        owner_id: userId,
+        user_id: targetUserId,
+        email,
+        full_name: data.fullName || null,
+        role: data.role,
+        branch: data.branch || null,
+        is_active: true,
+      });
+      if (insErr) throw new Error(insErr.message);
+    }
+
+    return { ok: true, userId: targetUserId, email, existed: !!existing };
   });
