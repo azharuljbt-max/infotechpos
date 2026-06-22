@@ -112,6 +112,7 @@ export type Database = {
           address: string | null
           created_at: string
           currency: string
+          default_user_id: string | null
           email: string | null
           id: string
           industry: string | null
@@ -133,6 +134,7 @@ export type Database = {
           address?: string | null
           created_at?: string
           currency?: string
+          default_user_id?: string | null
           email?: string | null
           id?: string
           industry?: string | null
@@ -154,6 +156,7 @@ export type Database = {
           address?: string | null
           created_at?: string
           currency?: string
+          default_user_id?: string | null
           email?: string | null
           id?: string
           industry?: string | null

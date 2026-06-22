@@ -1,0 +1,1 @@
+ALTER TABLE public.companies ADD COLUMN IF NOT EXISTS default_user_id uuid REFERENCES auth.users(id) ON DELETE SET NULL;
