@@ -128,7 +128,7 @@ function SalesPage() {
         description="View, filter and manage all completed sales from POS."
         actions={
           <Button size="sm" asChild>
-            <Link to="/pos"><Plus className="mr-1.5 h-3.5 w-3.5" />New sale (POS)</Link>
+            <Link to="/app/pos"><Plus className="mr-1.5 h-3.5 w-3.5" />New sale (POS)</Link>
           </Button>
         }
       />

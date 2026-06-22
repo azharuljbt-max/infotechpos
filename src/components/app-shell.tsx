@@ -32,25 +32,7 @@ export function AppShell() {
     },
   });
 
-  const { data: isCompanyLoginUser = false } = useQuery({
-    queryKey: ["is-company-login-user"],
-    queryFn: async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return false;
-      const { data } = await (supabase.from("user_roles" as any) as any)
-        .select("owner_id,user_id")
-        .eq("user_id", u.user.id)
-        .neq("owner_id", u.user.id)
-        .limit(1)
-        .maybeSingle();
-      return !!data;
-    },
-  });
-
-  const navGroups = isCompanyLoginUser
-    ? NAV.map((g) => ({ ...g, items: g.items.filter((i) => i.to !== "/saas") }))
-        .filter((g) => g.items.length > 0)
-    : NAV;
+  const navGroups = NAV;
 
   const lang = (settings?.language as "en" | "bn") ?? "en";
 
@@ -83,7 +65,7 @@ export function AppShell() {
         )}
       >
         <div className="flex h-14 items-center justify-between border-b border-sidebar-border px-4">
-          <Link to="/dashboard" className="flex items-center gap-2 font-semibold tracking-tight">
+          <Link to="/app/dashboard" className="flex items-center gap-2 font-semibold tracking-tight">
             <img src={logo} alt="Infotech ERP" className="h-7 w-7 rounded-md object-contain" />
             <span>Infotech ERP</span>
           </Link>
@@ -185,8 +167,8 @@ export function AppShell() {
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuLabel>{t("My account")}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild><Link to="/settings">{t("Settings")}</Link></DropdownMenuItem>
-                <DropdownMenuItem asChild><Link to="/team">{t("Team & Roles")}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/app/settings">{t("Settings")}</Link></DropdownMenuItem>
+                <DropdownMenuItem asChild><Link to="/app/team">{t("Team & Roles")}</Link></DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-3.5 w-3.5" /> {t("Sign out")}

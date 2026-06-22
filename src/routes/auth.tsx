@@ -13,7 +13,11 @@ export const Route = createFileRoute("/auth")({
   ssr: false,
   beforeLoad: async () => {
     const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/dashboard" });
+    if (data.session) {
+      const { data: sa } = await supabase
+        .from("super_admins").select("user_id").eq("user_id", data.session.user.id).maybeSingle();
+      throw redirect({ to: sa ? "/super-admin/dashboard" : "/app/dashboard" });
+    }
   },
   component: AuthPage,
 });
@@ -27,8 +31,12 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) navigate({ to: "/dashboard", replace: true });
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session) {
+        const { data: sa } = await supabase
+          .from("super_admins").select("user_id").eq("user_id", session.user.id).maybeSingle();
+        navigate({ to: sa ? "/super-admin/dashboard" : "/app/dashboard", replace: true });
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
@@ -40,7 +48,7 @@ function AuthPage() {
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email, password,
-          options: { emailRedirectTo: window.location.origin + "/dashboard", data: { full_name: name } },
+          options: { emailRedirectTo: window.location.origin + "/app/dashboard", data: { full_name: name } },
         });
         if (error) throw error;
         toast.success("Account created. Welcome!");
@@ -57,7 +65,7 @@ function AuthPage() {
 
   const handleGoogle = async () => {
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/dashboard" });
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/app/dashboard" });
     if (result.error) { toast.error("Google sign-in failed"); setLoading(false); }
   };
 
