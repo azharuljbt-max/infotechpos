@@ -3,9 +3,11 @@ import { PageHeader } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ArrowUpRight, ArrowDownRight, TrendingUp, ShoppingCart, Wallet, Receipt,
-  AlertTriangle, Plus,
+  AlertTriangle, Plus, CalendarIcon,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -14,10 +16,16 @@ import {
 import { useCurrency } from "@/lib/currency";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+import type { DateRange } from "react-day-picker";
 
 export const Route = createFileRoute("/_authenticated/app/dashboard")({
   component: DashboardPage,
 });
+
+type RangePreset = "7d" | "30d" | "90d" | "custom";
+
 
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
