@@ -3,9 +3,11 @@ import { PageHeader } from "@/components/app-shell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ArrowUpRight, ArrowDownRight, TrendingUp, ShoppingCart, Wallet, Receipt,
-  AlertTriangle, Plus,
+  AlertTriangle, Plus, CalendarIcon,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -14,10 +16,16 @@ import {
 import { useCurrency } from "@/lib/currency";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+import type { DateRange } from "react-day-picker";
 
 export const Route = createFileRoute("/_authenticated/app/dashboard")({
   component: DashboardPage,
 });
+
+type RangePreset = "7d" | "30d" | "90d" | "custom";
+
 
 const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -37,24 +45,47 @@ function monthBuckets(count: number) {
 }
 
 
-function todayRange() {
-  const start = new Date(); start.setHours(0, 0, 0, 0);
-  const end = new Date(start); end.setDate(end.getDate() + 1);
-  return { startIso: start.toISOString(), endIso: end.toISOString(), today: start.toISOString().slice(0, 10) };
+function startOfDay(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function endOfDay(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() + 1); return x; }
+function fmtDateLabel(d: Date) {
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
 function DashboardPage() {
   const { symbol: sym } = useCurrency();
   const fmtMoney = (n: number) => `${sym} ${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
+  const [preset, setPreset] = useState<RangePreset>("7d");
+  const [customRange, setCustomRange] = useState<DateRange | undefined>();
+  const [calOpen, setCalOpen] = useState(false);
+
+  const { start, end, label, days } = useMemo(() => {
+    const now = new Date();
+    if (preset === "custom" && customRange?.from) {
+      const s = startOfDay(customRange.from);
+      const e = endOfDay(customRange.to ?? customRange.from);
+      const d = Math.max(1, Math.round((e.getTime() - s.getTime()) / 86400000));
+      return { start: s, end: e, days: d, label: `${fmtDateLabel(s)} – ${fmtDateLabel(new Date(e.getTime() - 1))}` };
+    }
+    const d = preset === "30d" ? 30 : preset === "90d" ? 90 : 7;
+    const e = endOfDay(now);
+    const s = new Date(e); s.setDate(s.getDate() - d);
+    return { start: s, end: e, days: d, label: `Last ${d} days` };
+  }, [preset, customRange]);
+
+  const rangeKey = `${start.toISOString()}|${end.toISOString()}`;
+
   const { data: totals } = useQuery({
-    queryKey: ["dashboard-today-totals"],
+    queryKey: ["dashboard-range-totals", rangeKey],
     queryFn: async () => {
-      const { startIso, endIso, today } = todayRange();
+      const startIso = start.toISOString();
+      const endIso = end.toISOString();
+      const startDate = startIso.slice(0, 10);
+      const endDate = endIso.slice(0, 10);
       const [salesRes, purchasesRes, expensesRes] = await Promise.all([
         supabase.from("sales").select("total").gte("created_at", startIso).lt("created_at", endIso),
         supabase.from("purchases").select("total").gte("created_at", startIso).lt("created_at", endIso),
-        supabase.from("expenses").select("amount").eq("expense_date", today),
+        supabase.from("expenses").select("amount").gte("expense_date", startDate).lt("expense_date", endDate),
       ]);
       const sum = (rows: any[] | null, key: string) =>
         (rows ?? []).reduce((a, r) => a + Number(r[key] ?? 0), 0);
@@ -65,31 +96,33 @@ function DashboardPage() {
     },
   });
 
+
   const sales = totals?.sales ?? 0;
   const purchase = totals?.purchase ?? 0;
   const expense = totals?.expense ?? 0;
   const profit = totals?.profit ?? 0;
   const margin = sales > 0 ? Math.round((profit / sales) * 100) : 0;
 
+  const rangeHint = preset === "custom" ? label : `last ${days} days`;
   const kpis = [
-    { label: "Today's Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: "since midnight",
+    { label: "Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: rangeHint,
       gradient: "from-[oklch(0.64_0.18_38)] to-[oklch(0.72_0.2_50)]" },
-    { label: "Today's Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: "since midnight",
+    { label: "Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: rangeHint,
       gradient: "from-[oklch(0.6_0.2_265)] to-[oklch(0.65_0.18_295)]" },
-    { label: "Today's Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: "since midnight",
+    { label: "Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: rangeHint,
       gradient: "from-[oklch(0.65_0.22_350)] to-[oklch(0.6_0.2_15)]" },
-    { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`,
+    { label: "Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`,
       gradient: "from-[oklch(0.62_0.16_155)] to-[oklch(0.7_0.16_180)]" },
   ];
 
   const { data: topProducts = [] } = useQuery({
-    queryKey: ["dashboard-top-products"],
+    queryKey: ["dashboard-top-products", rangeKey],
     queryFn: async () => {
-      const since = new Date(); since.setDate(since.getDate() - 30);
       const { data } = await supabase
         .from("sale_items")
         .select("product_name, quantity, total")
-        .gte("created_at", since.toISOString());
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString());
       const map = new Map<string, { name: string; sold: number; revenue: number }>();
       for (const r of data ?? []) {
         const key = r.product_name ?? "Unknown";
@@ -101,6 +134,7 @@ function DashboardPage() {
       return Array.from(map.values()).sort((a, b) => b.sold - a.sold).slice(0, 5);
     },
   });
+
 
   const { data: lowStock = [] } = useQuery({
     queryKey: ["dashboard-low-stock"],
@@ -197,7 +231,7 @@ function DashboardPage() {
     <>
       <PageHeader
         title="Dashboard"
-        description="Today's performance across your company."
+        description="Performance across your company."
         actions={
           <>
             <Button variant="outline" size="sm">Export</Button>
@@ -206,8 +240,62 @@ function DashboardPage() {
         }
       />
 
+      {/* Date range selector */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="inline-flex items-center rounded-md border border-border bg-card p-0.5 shadow-sm">
+          {(["7d", "30d", "90d"] as const).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => { setPreset(p); setCustomRange(undefined); }}
+              className={cn(
+                "rounded px-3 py-1.5 text-xs font-medium transition",
+                preset === p
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+            >
+              {p === "7d" ? "7 days" : p === "30d" ? "30 days" : "90 days"}
+            </button>
+          ))}
+          <Popover open={calOpen} onOpenChange={setCalOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setPreset("custom")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium transition",
+                  preset === "custom"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                )}
+              >
+                <CalendarIcon className="h-3.5 w-3.5" />
+                Custom
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="range"
+                selected={customRange}
+                onSelect={(r) => {
+                  setCustomRange(r);
+                  setPreset("custom");
+                  if (r?.from && r?.to) setCalOpen(false);
+                }}
+                numberOfMonths={2}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <span className="text-xs text-muted-foreground">{label}</span>
+      </div>
+
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
