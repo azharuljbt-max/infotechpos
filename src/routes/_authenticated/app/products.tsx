@@ -103,6 +103,7 @@ function ProductsPage() {
         p.name.toLowerCase().includes(q) ||
         (p.sku ?? "").toLowerCase().includes(q) ||
         (p.category ?? "").toLowerCase().includes(q) ||
+        (p.subcategory ?? "").toLowerCase().includes(q) ||
         (p.barcode ?? "").toLowerCase().includes(q),
     );
   }, [products, query]);
