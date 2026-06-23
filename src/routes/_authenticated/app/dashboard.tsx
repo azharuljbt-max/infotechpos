@@ -72,10 +72,14 @@ function DashboardPage() {
   const margin = sales > 0 ? Math.round((profit / sales) * 100) : 0;
 
   const kpis = [
-    { label: "Today's Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: "since midnight", tint: "bg-chart-1/15 text-chart-1 ring-chart-1/20" },
-    { label: "Today's Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: "since midnight", tint: "bg-chart-2/15 text-chart-2 ring-chart-2/20" },
-    { label: "Today's Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: "since midnight", tint: "bg-chart-4/15 text-chart-4 ring-chart-4/20" },
-    { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`, tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
+    { label: "Today's Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: "since midnight",
+      gradient: "from-[oklch(0.64_0.18_38)] to-[oklch(0.72_0.2_50)]" },
+    { label: "Today's Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: "since midnight",
+      gradient: "from-[oklch(0.6_0.2_265)] to-[oklch(0.65_0.18_295)]" },
+    { label: "Today's Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: "since midnight",
+      gradient: "from-[oklch(0.65_0.22_350)] to-[oklch(0.6_0.2_15)]" },
+    { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`,
+      gradient: "from-[oklch(0.62_0.16_155)] to-[oklch(0.7_0.16_180)]" },
   ];
 
   const { data: topProducts = [] } = useQuery({
