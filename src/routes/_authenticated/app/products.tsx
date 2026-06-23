@@ -252,6 +252,7 @@ function ProductsPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Sub-category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead className="text-right">Cost</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
