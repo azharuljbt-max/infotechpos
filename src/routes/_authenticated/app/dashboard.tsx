@@ -211,24 +211,25 @@ function DashboardPage() {
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
-            <Card key={k.label} className="p-4 transition hover:shadow-md">
-              <div className="flex items-center gap-3">
-                <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ring-1 ${k.tint}`}>
+            <Card key={k.label} className={`relative overflow-hidden p-4 text-white transition hover:shadow-lg bg-gradient-to-br ${k.gradient} border-0`}>
+              <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-xl" />
+              <div className="relative flex items-center gap-3">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/20 ring-1 ring-white/30 backdrop-blur-sm">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs text-muted-foreground">{k.label}</div>
+                  <div className="truncate text-xs text-white/80">{k.label}</div>
                   <div className="text-xl font-semibold tracking-tight">{k.value}</div>
                 </div>
               </div>
-              <div className="mt-3 flex items-center gap-2 text-xs">
+              <div className="relative mt-3 flex items-center gap-2 text-xs">
                 {k.delta && (
-                  <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-white/20 px-2 py-0.5 font-medium">
                     {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                     {k.delta}
                   </span>
                 )}
-                <span className="text-muted-foreground">{k.hint}</span>
+                <span className="text-white/80">{k.hint}</span>
               </div>
             </Card>
           );
