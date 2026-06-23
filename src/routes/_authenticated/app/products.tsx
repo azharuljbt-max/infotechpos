@@ -126,6 +126,7 @@ function ProductsPage() {
         sku: values.sku || null,
         barcode: values.barcode || null,
         category: values.category || null,
+        subcategory: values.subcategory || null,
         description: values.description || null,
         user_id,
       };
