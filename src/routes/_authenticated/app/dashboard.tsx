@@ -96,6 +96,61 @@ function DashboardPage() {
     },
   });
 
+  const { data: daily } = useQuery({
+    queryKey: ["dashboard-daily-due"],
+    queryFn: async () => {
+      const now = new Date();
+      const dayStart = startOfDay(now);
+      const dayEnd = endOfDay(now);
+      const dayStartIso = dayStart.toISOString();
+      const dayEndIso = dayEnd.toISOString();
+      const dayStartDate = dayStartIso.slice(0, 10);
+      const dayEndDate = dayEndIso.slice(0, 10);
+
+      const isBank = (m?: string | null) => {
+        const x = (m ?? "").toLowerCase();
+        return x !== "" && x !== "cash";
+      };
+
+      const [salesToday, purchasesToday, expensesToday, salesAll, purchasesAll] = await Promise.all([
+        supabase.from("sales").select("total, amount_paid, payment_method")
+          .gte("created_at", dayStartIso).lt("created_at", dayEndIso),
+        supabase.from("purchases").select("total, amount_paid, payment_method")
+          .gte("created_at", dayStartIso).lt("created_at", dayEndIso),
+        supabase.from("expenses").select("amount, payment_method")
+          .gte("expense_date", dayStartDate).lt("expense_date", dayEndDate),
+        supabase.from("sales").select("total, amount_paid"),
+        supabase.from("purchases").select("total, amount_paid"),
+      ]);
+
+      const s = salesToday.data ?? [];
+      const p = purchasesToday.data ?? [];
+      const e = expensesToday.data ?? [];
+
+      const bank =
+        s.filter((r: any) => isBank(r.payment_method)).reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        p.filter((r: any) => isBank(r.payment_method)).reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        e.filter((r: any) => isBank(r.payment_method)).reduce((a, r: any) => a + Number(r.amount ?? 0), 0);
+
+      const transactions = s.length + p.length + e.length;
+
+      const payment =
+        s.reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        p.reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        e.reduce((a, r: any) => a + Number(r.amount ?? 0), 0);
+
+      const dailyDue =
+        s.reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0) +
+        p.reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0);
+
+      const totalDue =
+        (salesAll.data ?? []).reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0) +
+        (purchasesAll.data ?? []).reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0);
+
+      return { bank, transactions, payment, dailyDue, totalDue };
+    },
+  });
+
 
   const sales = totals?.sales ?? 0;
   const purchase = totals?.purchase ?? 0;
