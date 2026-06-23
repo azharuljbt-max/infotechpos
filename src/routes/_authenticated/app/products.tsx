@@ -38,6 +38,7 @@ type Product = {
   sku: string | null;
   barcode: string | null;
   category: string | null;
+  subcategory: string | null;
   unit: string;
   price: number;
   cost: number;
@@ -55,6 +56,7 @@ const productSchema = z.object({
   sku: z.string().trim().max(64).optional().or(z.literal("")),
   barcode: z.string().trim().max(64).optional().or(z.literal("")),
   category: z.string().trim().max(64).optional().or(z.literal("")),
+  subcategory: z.string().trim().max(64).optional().or(z.literal("")),
   unit: z.string().trim().min(1).max(16),
   price: z.coerce.number().min(0),
   cost: z.coerce.number().min(0),
@@ -66,7 +68,7 @@ const productSchema = z.object({
 type ProductForm = z.infer<typeof productSchema>;
 
 const emptyForm: ProductForm = {
-  name: "", sku: "", barcode: "", category: "", unit: "pcs",
+  name: "", sku: "", barcode: "", category: "", subcategory: "", unit: "pcs",
   price: 0, cost: 0, stock: 0, reorder_level: 0,
   description: "", status: "active",
 };
@@ -101,6 +103,7 @@ function ProductsPage() {
         p.name.toLowerCase().includes(q) ||
         (p.sku ?? "").toLowerCase().includes(q) ||
         (p.category ?? "").toLowerCase().includes(q) ||
+        (p.subcategory ?? "").toLowerCase().includes(q) ||
         (p.barcode ?? "").toLowerCase().includes(q),
     );
   }, [products, query]);
@@ -123,6 +126,7 @@ function ProductsPage() {
         sku: values.sku || null,
         barcode: values.barcode || null,
         category: values.category || null,
+        subcategory: values.subcategory || null,
         description: values.description || null,
         user_id,
       };
@@ -172,6 +176,7 @@ function ProductsPage() {
       sku: p.sku ?? "",
       barcode: p.barcode ?? "",
       category: p.category ?? "",
+      subcategory: p.subcategory ?? "",
       unit: p.unit,
       price: Number(p.price),
       cost: Number(p.cost),
@@ -247,6 +252,7 @@ function ProductsPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Sub-category</TableHead>
                 <TableHead className="text-right">Price</TableHead>
                 <TableHead className="text-right">Cost</TableHead>
                 <TableHead className="text-right">Stock</TableHead>
@@ -262,6 +268,7 @@ function ProductsPage() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell className="text-muted-foreground">{p.sku || "—"}</TableCell>
                     <TableCell className="text-muted-foreground">{p.category || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{p.subcategory || "—"}</TableCell>
                     <TableCell className="text-right tabular-nums">{fmt(Number(p.price))}</TableCell>
                     <TableCell className="text-right tabular-nums text-muted-foreground">{fmt(Number(p.cost))}</TableCell>
                     <TableCell className="text-right tabular-nums">
@@ -312,6 +319,9 @@ function ProductsPage() {
             </Field>
             <Field label="Category" error={errors.category}>
               <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+            </Field>
+            <Field label="Sub-category" error={errors.subcategory}>
+              <Input value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} />
             </Field>
             <Field label="Unit" error={errors.unit}>
               <Input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} />
