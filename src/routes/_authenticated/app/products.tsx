@@ -68,7 +68,7 @@ const productSchema = z.object({
 type ProductForm = z.infer<typeof productSchema>;
 
 const emptyForm: ProductForm = {
-  name: "", sku: "", barcode: "", category: "", unit: "pcs",
+  name: "", sku: "", barcode: "", category: "", subcategory: "", unit: "pcs",
   price: 0, cost: 0, stock: 0, reorder_level: 0,
   description: "", status: "active",
 };
