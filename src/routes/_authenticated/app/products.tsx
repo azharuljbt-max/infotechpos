@@ -38,6 +38,7 @@ type Product = {
   sku: string | null;
   barcode: string | null;
   category: string | null;
+  subcategory: string | null;
   unit: string;
   price: number;
   cost: number;
