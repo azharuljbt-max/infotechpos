@@ -72,10 +72,14 @@ function DashboardPage() {
   const margin = sales > 0 ? Math.round((profit / sales) * 100) : 0;
 
   const kpis = [
-    { label: "Today's Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: "since midnight", tint: "bg-chart-1/15 text-chart-1 ring-chart-1/20" },
-    { label: "Today's Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: "since midnight", tint: "bg-chart-2/15 text-chart-2 ring-chart-2/20" },
-    { label: "Today's Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: "since midnight", tint: "bg-chart-4/15 text-chart-4 ring-chart-4/20" },
-    { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`, tint: "bg-chart-3/15 text-chart-3 ring-chart-3/20" },
+    { label: "Today's Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: "since midnight",
+      gradient: "from-[oklch(0.64_0.18_38)] to-[oklch(0.72_0.2_50)]" },
+    { label: "Today's Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: "since midnight",
+      gradient: "from-[oklch(0.6_0.2_265)] to-[oklch(0.65_0.18_295)]" },
+    { label: "Today's Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: "since midnight",
+      gradient: "from-[oklch(0.65_0.22_350)] to-[oklch(0.6_0.2_15)]" },
+    { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`,
+      gradient: "from-[oklch(0.62_0.16_155)] to-[oklch(0.7_0.16_180)]" },
   ];
 
   const { data: topProducts = [] } = useQuery({
@@ -207,24 +211,25 @@ function DashboardPage() {
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
-            <Card key={k.label} className="p-4 transition hover:shadow-md">
-              <div className="flex items-center gap-3">
-                <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ring-1 ${k.tint}`}>
+            <Card key={k.label} className={`relative overflow-hidden p-4 text-white transition hover:shadow-lg bg-gradient-to-br ${k.gradient} border-0`}>
+              <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-xl" />
+              <div className="relative flex items-center gap-3">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/20 ring-1 ring-white/30 backdrop-blur-sm">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs text-muted-foreground">{k.label}</div>
+                  <div className="truncate text-xs text-white/80">{k.label}</div>
                   <div className="text-xl font-semibold tracking-tight">{k.value}</div>
                 </div>
               </div>
-              <div className="mt-3 flex items-center gap-2 text-xs">
+              <div className="relative mt-3 flex items-center gap-2 text-xs">
                 {k.delta && (
-                  <span className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 font-medium ${k.up ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"}`}>
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-white/20 px-2 py-0.5 font-medium">
                     {k.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
                     {k.delta}
                   </span>
                 )}
-                <span className="text-muted-foreground">{k.hint}</span>
+                <span className="text-white/80">{k.hint}</span>
               </div>
             </Card>
           );
