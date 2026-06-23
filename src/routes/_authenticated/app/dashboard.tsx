@@ -45,24 +45,47 @@ function monthBuckets(count: number) {
 }
 
 
-function todayRange() {
-  const start = new Date(); start.setHours(0, 0, 0, 0);
-  const end = new Date(start); end.setDate(end.getDate() + 1);
-  return { startIso: start.toISOString(), endIso: end.toISOString(), today: start.toISOString().slice(0, 10) };
+function startOfDay(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function endOfDay(d: Date) { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() + 1); return x; }
+function fmtDateLabel(d: Date) {
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
 function DashboardPage() {
   const { symbol: sym } = useCurrency();
   const fmtMoney = (n: number) => `${sym} ${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
 
+  const [preset, setPreset] = useState<RangePreset>("7d");
+  const [customRange, setCustomRange] = useState<DateRange | undefined>();
+  const [calOpen, setCalOpen] = useState(false);
+
+  const { start, end, label, days } = useMemo(() => {
+    const now = new Date();
+    if (preset === "custom" && customRange?.from) {
+      const s = startOfDay(customRange.from);
+      const e = endOfDay(customRange.to ?? customRange.from);
+      const d = Math.max(1, Math.round((e.getTime() - s.getTime()) / 86400000));
+      return { start: s, end: e, days: d, label: `${fmtDateLabel(s)} – ${fmtDateLabel(new Date(e.getTime() - 1))}` };
+    }
+    const d = preset === "30d" ? 30 : preset === "90d" ? 90 : 7;
+    const e = endOfDay(now);
+    const s = new Date(e); s.setDate(s.getDate() - d);
+    return { start: s, end: e, days: d, label: `Last ${d} days` };
+  }, [preset, customRange]);
+
+  const rangeKey = `${start.toISOString()}|${end.toISOString()}`;
+
   const { data: totals } = useQuery({
-    queryKey: ["dashboard-today-totals"],
+    queryKey: ["dashboard-range-totals", rangeKey],
     queryFn: async () => {
-      const { startIso, endIso, today } = todayRange();
+      const startIso = start.toISOString();
+      const endIso = end.toISOString();
+      const startDate = startIso.slice(0, 10);
+      const endDate = endIso.slice(0, 10);
       const [salesRes, purchasesRes, expensesRes] = await Promise.all([
         supabase.from("sales").select("total").gte("created_at", startIso).lt("created_at", endIso),
         supabase.from("purchases").select("total").gte("created_at", startIso).lt("created_at", endIso),
-        supabase.from("expenses").select("amount").eq("expense_date", today),
+        supabase.from("expenses").select("amount").gte("expense_date", startDate).lt("expense_date", endDate),
       ]);
       const sum = (rows: any[] | null, key: string) =>
         (rows ?? []).reduce((a, r) => a + Number(r[key] ?? 0), 0);
@@ -72,6 +95,7 @@ function DashboardPage() {
       return { sales, purchase, expense, profit: sales - purchase - expense };
     },
   });
+
 
   const sales = totals?.sales ?? 0;
   const purchase = totals?.purchase ?? 0;
