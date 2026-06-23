@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, ShoppingCart, Package, Boxes, Truck, Receipt, Users, Building2,
   FileText, FileSignature, Wallet, BarChart3, Calculator, Bell, Settings, ShieldCheck,
-  ClipboardList, BadgePercent,
+  ClipboardList, BadgePercent, Tags, Tag,
 } from "lucide-react";
 
 export type NavItem = { label: string; to: string; icon: any };
@@ -19,6 +19,8 @@ export const NAV: NavGroup[] = [
     label: "Inventory",
     items: [
       { label: "Products", to: "/app/products", icon: Package },
+      { label: "Categories", to: "/app/categories", icon: Tags },
+      { label: "Sub-Categories", to: "/app/subcategories", icon: Tag },
       { label: "Stock", to: "/app/stock", icon: Boxes },
       { label: "Warehouses", to: "/app/warehouses", icon: Building2 },
     ],

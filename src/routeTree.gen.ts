@@ -30,6 +30,7 @@ import { Route as SuperAdminProtectedAuditRouteImport } from './routes/super-adm
 import { Route as AuthenticatedAppWarehousesRouteImport } from './routes/_authenticated/app/warehouses'
 import { Route as AuthenticatedAppTeamRouteImport } from './routes/_authenticated/app/team'
 import { Route as AuthenticatedAppSuppliersRouteImport } from './routes/_authenticated/app/suppliers'
+import { Route as AuthenticatedAppSubcategoriesRouteImport } from './routes/_authenticated/app/subcategories'
 import { Route as AuthenticatedAppStockRouteImport } from './routes/_authenticated/app/stock'
 import { Route as AuthenticatedAppSettingsRouteImport } from './routes/_authenticated/app/settings'
 import { Route as AuthenticatedAppSalesRouteImport } from './routes/_authenticated/app/sales'
@@ -44,6 +45,7 @@ import { Route as AuthenticatedAppExpensesRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAppDashboardRouteImport } from './routes/_authenticated/app/dashboard'
 import { Route as AuthenticatedAppCustomersRouteImport } from './routes/_authenticated/app/customers'
 import { Route as AuthenticatedAppCompaniesRouteImport } from './routes/_authenticated/app/companies'
+import { Route as AuthenticatedAppCategoriesRouteImport } from './routes/_authenticated/app/categories'
 import { Route as AuthenticatedAppAuditRouteImport } from './routes/_authenticated/app/audit'
 import { Route as AuthenticatedAppAccountingRouteImport } from './routes/_authenticated/app/accounting'
 
@@ -166,6 +168,12 @@ const AuthenticatedAppSuppliersRoute =
     path: '/suppliers',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppSubcategoriesRoute =
+  AuthenticatedAppSubcategoriesRouteImport.update({
+    id: '/subcategories',
+    path: '/subcategories',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppStockRoute = AuthenticatedAppStockRouteImport.update({
   id: '/stock',
   path: '/stock',
@@ -246,6 +254,12 @@ const AuthenticatedAppCompaniesRoute =
     path: '/companies',
     getParentRoute: () => AuthenticatedAppRouteRoute,
   } as any)
+const AuthenticatedAppCategoriesRoute =
+  AuthenticatedAppCategoriesRouteImport.update({
+    id: '/categories',
+    path: '/categories',
+    getParentRoute: () => AuthenticatedAppRouteRoute,
+  } as any)
 const AuthenticatedAppAuditRoute = AuthenticatedAppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -266,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/app/accounting': typeof AuthenticatedAppAccountingRoute
   '/app/audit': typeof AuthenticatedAppAuditRoute
+  '/app/categories': typeof AuthenticatedAppCategoriesRoute
   '/app/companies': typeof AuthenticatedAppCompaniesRoute
   '/app/customers': typeof AuthenticatedAppCustomersRoute
   '/app/dashboard': typeof AuthenticatedAppDashboardRoute
@@ -280,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/app/sales': typeof AuthenticatedAppSalesRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/stock': typeof AuthenticatedAppStockRoute
+  '/app/subcategories': typeof AuthenticatedAppSubcategoriesRoute
   '/app/suppliers': typeof AuthenticatedAppSuppliersRoute
   '/app/team': typeof AuthenticatedAppTeamRoute
   '/app/warehouses': typeof AuthenticatedAppWarehousesRoute
@@ -304,6 +320,7 @@ export interface FileRoutesByTo {
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/app/accounting': typeof AuthenticatedAppAccountingRoute
   '/app/audit': typeof AuthenticatedAppAuditRoute
+  '/app/categories': typeof AuthenticatedAppCategoriesRoute
   '/app/companies': typeof AuthenticatedAppCompaniesRoute
   '/app/customers': typeof AuthenticatedAppCustomersRoute
   '/app/dashboard': typeof AuthenticatedAppDashboardRoute
@@ -318,6 +335,7 @@ export interface FileRoutesByTo {
   '/app/sales': typeof AuthenticatedAppSalesRoute
   '/app/settings': typeof AuthenticatedAppSettingsRoute
   '/app/stock': typeof AuthenticatedAppStockRoute
+  '/app/subcategories': typeof AuthenticatedAppSubcategoriesRoute
   '/app/suppliers': typeof AuthenticatedAppSuppliersRoute
   '/app/team': typeof AuthenticatedAppTeamRoute
   '/app/warehouses': typeof AuthenticatedAppWarehousesRoute
@@ -344,6 +362,7 @@ export interface FileRoutesById {
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/_authenticated/app/accounting': typeof AuthenticatedAppAccountingRoute
   '/_authenticated/app/audit': typeof AuthenticatedAppAuditRoute
+  '/_authenticated/app/categories': typeof AuthenticatedAppCategoriesRoute
   '/_authenticated/app/companies': typeof AuthenticatedAppCompaniesRoute
   '/_authenticated/app/customers': typeof AuthenticatedAppCustomersRoute
   '/_authenticated/app/dashboard': typeof AuthenticatedAppDashboardRoute
@@ -358,6 +377,7 @@ export interface FileRoutesById {
   '/_authenticated/app/sales': typeof AuthenticatedAppSalesRoute
   '/_authenticated/app/settings': typeof AuthenticatedAppSettingsRoute
   '/_authenticated/app/stock': typeof AuthenticatedAppStockRoute
+  '/_authenticated/app/subcategories': typeof AuthenticatedAppSubcategoriesRoute
   '/_authenticated/app/suppliers': typeof AuthenticatedAppSuppliersRoute
   '/_authenticated/app/team': typeof AuthenticatedAppTeamRoute
   '/_authenticated/app/warehouses': typeof AuthenticatedAppWarehousesRoute
@@ -384,6 +404,7 @@ export interface FileRouteTypes {
     | '/super-admin/login'
     | '/app/accounting'
     | '/app/audit'
+    | '/app/categories'
     | '/app/companies'
     | '/app/customers'
     | '/app/dashboard'
@@ -398,6 +419,7 @@ export interface FileRouteTypes {
     | '/app/sales'
     | '/app/settings'
     | '/app/stock'
+    | '/app/subcategories'
     | '/app/suppliers'
     | '/app/team'
     | '/app/warehouses'
@@ -422,6 +444,7 @@ export interface FileRouteTypes {
     | '/super-admin/login'
     | '/app/accounting'
     | '/app/audit'
+    | '/app/categories'
     | '/app/companies'
     | '/app/customers'
     | '/app/dashboard'
@@ -436,6 +459,7 @@ export interface FileRouteTypes {
     | '/app/sales'
     | '/app/settings'
     | '/app/stock'
+    | '/app/subcategories'
     | '/app/suppliers'
     | '/app/team'
     | '/app/warehouses'
@@ -461,6 +485,7 @@ export interface FileRouteTypes {
     | '/super-admin/login'
     | '/_authenticated/app/accounting'
     | '/_authenticated/app/audit'
+    | '/_authenticated/app/categories'
     | '/_authenticated/app/companies'
     | '/_authenticated/app/customers'
     | '/_authenticated/app/dashboard'
@@ -475,6 +500,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/sales'
     | '/_authenticated/app/settings'
     | '/_authenticated/app/stock'
+    | '/_authenticated/app/subcategories'
     | '/_authenticated/app/suppliers'
     | '/_authenticated/app/team'
     | '/_authenticated/app/warehouses'
@@ -649,6 +675,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppSuppliersRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/subcategories': {
+      id: '/_authenticated/app/subcategories'
+      path: '/subcategories'
+      fullPath: '/app/subcategories'
+      preLoaderRoute: typeof AuthenticatedAppSubcategoriesRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/stock': {
       id: '/_authenticated/app/stock'
       path: '/stock'
@@ -747,6 +780,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppCompaniesRouteImport
       parentRoute: typeof AuthenticatedAppRouteRoute
     }
+    '/_authenticated/app/categories': {
+      id: '/_authenticated/app/categories'
+      path: '/categories'
+      fullPath: '/app/categories'
+      preLoaderRoute: typeof AuthenticatedAppCategoriesRouteImport
+      parentRoute: typeof AuthenticatedAppRouteRoute
+    }
     '/_authenticated/app/audit': {
       id: '/_authenticated/app/audit'
       path: '/audit'
@@ -767,6 +807,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppAccountingRoute: typeof AuthenticatedAppAccountingRoute
   AuthenticatedAppAuditRoute: typeof AuthenticatedAppAuditRoute
+  AuthenticatedAppCategoriesRoute: typeof AuthenticatedAppCategoriesRoute
   AuthenticatedAppCompaniesRoute: typeof AuthenticatedAppCompaniesRoute
   AuthenticatedAppCustomersRoute: typeof AuthenticatedAppCustomersRoute
   AuthenticatedAppDashboardRoute: typeof AuthenticatedAppDashboardRoute
@@ -781,6 +822,7 @@ interface AuthenticatedAppRouteRouteChildren {
   AuthenticatedAppSalesRoute: typeof AuthenticatedAppSalesRoute
   AuthenticatedAppSettingsRoute: typeof AuthenticatedAppSettingsRoute
   AuthenticatedAppStockRoute: typeof AuthenticatedAppStockRoute
+  AuthenticatedAppSubcategoriesRoute: typeof AuthenticatedAppSubcategoriesRoute
   AuthenticatedAppSuppliersRoute: typeof AuthenticatedAppSuppliersRoute
   AuthenticatedAppTeamRoute: typeof AuthenticatedAppTeamRoute
   AuthenticatedAppWarehousesRoute: typeof AuthenticatedAppWarehousesRoute
@@ -789,6 +831,7 @@ interface AuthenticatedAppRouteRouteChildren {
 const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppAccountingRoute: AuthenticatedAppAccountingRoute,
   AuthenticatedAppAuditRoute: AuthenticatedAppAuditRoute,
+  AuthenticatedAppCategoriesRoute: AuthenticatedAppCategoriesRoute,
   AuthenticatedAppCompaniesRoute: AuthenticatedAppCompaniesRoute,
   AuthenticatedAppCustomersRoute: AuthenticatedAppCustomersRoute,
   AuthenticatedAppDashboardRoute: AuthenticatedAppDashboardRoute,
@@ -803,6 +846,7 @@ const AuthenticatedAppRouteRouteChildren: AuthenticatedAppRouteRouteChildren = {
   AuthenticatedAppSalesRoute: AuthenticatedAppSalesRoute,
   AuthenticatedAppSettingsRoute: AuthenticatedAppSettingsRoute,
   AuthenticatedAppStockRoute: AuthenticatedAppStockRoute,
+  AuthenticatedAppSubcategoriesRoute: AuthenticatedAppSubcategoriesRoute,
   AuthenticatedAppSuppliersRoute: AuthenticatedAppSuppliersRoute,
   AuthenticatedAppTeamRoute: AuthenticatedAppTeamRoute,
   AuthenticatedAppWarehousesRoute: AuthenticatedAppWarehousesRoute,
