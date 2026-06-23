@@ -7,7 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ArrowUpRight, ArrowDownRight, TrendingUp, ShoppingCart, Wallet, Receipt,
-  AlertTriangle, Plus, CalendarIcon, Landmark, ArrowLeftRight, BanknoteArrowUp, Clock, AlertCircle,
+  AlertTriangle, Plus, CalendarIcon, Landmark, ArrowLeftRight, Banknote, Clock, AlertCircle,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
