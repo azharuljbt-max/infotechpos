@@ -377,3 +377,20 @@ function PnLRow({ label, value, bold, highlight }: { label: string; value: strin
     </div>
   );
 }
+
+function ExportButtons({ title, rows, filename }: { title: string; rows: Record<string, any>[]; filename: string }) {
+  const disabled = !rows || rows.length === 0;
+  return (
+    <div className="flex items-center gap-2">
+      <Button size="sm" variant="outline" disabled={disabled} onClick={() => toPDF(title, rows, `${filename}.pdf`)}>
+        <FileText className="mr-2 h-4 w-4" />PDF
+      </Button>
+      <Button size="sm" variant="outline" disabled={disabled} onClick={() => toXLSX(rows, `${filename}.xlsx`, title)}>
+        <FileSpreadsheet className="mr-2 h-4 w-4" />Excel
+      </Button>
+      <Button size="sm" variant="ghost" disabled={disabled} onClick={() => toCSV(rows, `${filename}.csv`)}>
+        <Download className="mr-2 h-4 w-4" />CSV
+      </Button>
+    </div>
+  );
+}
