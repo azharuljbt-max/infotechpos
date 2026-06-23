@@ -103,25 +103,26 @@ function DashboardPage() {
   const profit = totals?.profit ?? 0;
   const margin = sales > 0 ? Math.round((profit / sales) * 100) : 0;
 
+  const rangeHint = preset === "custom" ? label : `last ${days} days`;
   const kpis = [
-    { label: "Today's Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: "since midnight",
+    { label: "Sales", value: fmtMoney(sales), delta: "", up: true, icon: ShoppingCart, hint: rangeHint,
       gradient: "from-[oklch(0.64_0.18_38)] to-[oklch(0.72_0.2_50)]" },
-    { label: "Today's Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: "since midnight",
+    { label: "Purchase", value: fmtMoney(purchase), delta: "", up: true, icon: Receipt, hint: rangeHint,
       gradient: "from-[oklch(0.6_0.2_265)] to-[oklch(0.65_0.18_295)]" },
-    { label: "Today's Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: "since midnight",
+    { label: "Expense", value: fmtMoney(expense), delta: "", up: false, icon: Wallet, hint: rangeHint,
       gradient: "from-[oklch(0.65_0.22_350)] to-[oklch(0.6_0.2_15)]" },
-    { label: "Today's Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`,
+    { label: "Profit", value: fmtMoney(profit), delta: "", up: profit >= 0, icon: TrendingUp, hint: `net margin ${margin}%`,
       gradient: "from-[oklch(0.62_0.16_155)] to-[oklch(0.7_0.16_180)]" },
   ];
 
   const { data: topProducts = [] } = useQuery({
-    queryKey: ["dashboard-top-products"],
+    queryKey: ["dashboard-top-products", rangeKey],
     queryFn: async () => {
-      const since = new Date(); since.setDate(since.getDate() - 30);
       const { data } = await supabase
         .from("sale_items")
         .select("product_name, quantity, total")
-        .gte("created_at", since.toISOString());
+        .gte("created_at", start.toISOString())
+        .lt("created_at", end.toISOString());
       const map = new Map<string, { name: string; sold: number; revenue: number }>();
       for (const r of data ?? []) {
         const key = r.product_name ?? "Unknown";
@@ -133,6 +134,7 @@ function DashboardPage() {
       return Array.from(map.values()).sort((a, b) => b.sold - a.sold).slice(0, 5);
     },
   });
+
 
   const { data: lowStock = [] } = useQuery({
     queryKey: ["dashboard-low-stock"],
