@@ -504,6 +504,7 @@ export type Database = {
           sku: string | null
           status: string
           stock: number
+          subcategory: string | null
           unit: string
           updated_at: string
           user_id: string
@@ -522,6 +523,7 @@ export type Database = {
           sku?: string | null
           status?: string
           stock?: number
+          subcategory?: string | null
           unit?: string
           updated_at?: string
           user_id: string
@@ -540,6 +542,7 @@ export type Database = {
           sku?: string | null
           status?: string
           stock?: number
+          subcategory?: string | null
           unit?: string
           updated_at?: string
           user_id?: string
