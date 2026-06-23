@@ -80,6 +80,7 @@ function ReportsPage() {
   const { fmt, symbol } = useCurrency();
   const [range, setRange] = useState("30");
   const [tab, setTab] = useState("sales");
+  const [search, setSearch] = useState("");
 
   const since = useMemo(() => startOf(parseInt(range, 10)), [range]);
 
