@@ -262,12 +262,12 @@ function ReportsPage() {
 
         <TabsContent value="purchases">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Purchases</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(purchases as any, "purchases.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Purchases</CardTitle><ExportButtons title="Purchases Report" rows={fPurchases} filename="purchases" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Supplier</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Total</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {purchases.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No data</TableCell></TableRow>) : purchases.map((p: any) => (
+                  {fPurchases.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No data</TableCell></TableRow>) : fPurchases.map((p: any) => (
                     <TableRow key={p.id}><TableCell>{p.invoice_no}</TableCell><TableCell>{p.supplier_name}</TableCell><TableCell>{p.purchase_date}</TableCell><TableCell><Badge variant="secondary">{p.status}</Badge></TableCell><TableCell className="text-right">{fmt(p.total)}</TableCell></TableRow>
                   ))}
                 </TableBody>
@@ -278,7 +278,7 @@ function ReportsPage() {
 
         <TabsContent value="expenses" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Expenses by Category</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(expenses as any, "expenses.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Expenses by Category</CardTitle><ExportButtons title="Expenses Report" rows={fExpenses} filename="expenses" /></CardHeader>
             <CardContent className="h-72">
               {expenseByCat.length === 0 ? <div className="flex h-full items-center justify-center text-muted-foreground">No expenses</div> : (
                 <ResponsiveContainer><PieChart><Pie data={expenseByCat} dataKey="value" nameKey="name" outerRadius={90} label>{expenseByCat.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip formatter={(v: any) => `${symbol}${Number(v).toFixed(2)}`} /><Legend /></PieChart></ResponsiveContainer>
@@ -289,7 +289,20 @@ function ReportsPage() {
 
         <TabsContent value="pnl">
           <Card>
-            <CardHeader><CardTitle>Profit & Loss Summary</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Profit & Loss Summary</CardTitle>
+              <ExportButtons
+                title="Profit & Loss Summary"
+                rows={[
+                  { Item: "Revenue (Sales)", Amount: totalSales },
+                  { Item: "Cost of Goods (Purchases)", Amount: -totalPurchases },
+                  { Item: "Gross Profit", Amount: grossProfit },
+                  { Item: "Operating Expenses", Amount: -totalExpenses },
+                  { Item: "Net Profit", Amount: netProfit },
+                ]}
+                filename="profit-loss"
+              />
+            </CardHeader>
             <CardContent className="space-y-3">
               <PnLRow label="Revenue (Sales)" value={fmt(totalSales)} />
               <PnLRow label="Cost of Goods (Purchases)" value={`- ${fmt(totalPurchases)}`} />
@@ -305,12 +318,12 @@ function ReportsPage() {
 
         <TabsContent value="inventory" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Low / Out of Stock</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(lowStock as any, "low-stock.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Low / Out of Stock</CardTitle><ExportButtons title="Low Stock Report" rows={fLowStock} filename="low-stock" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Product</TableHead><TableHead>SKU</TableHead><TableHead className="text-right">Stock</TableHead><TableHead className="text-right">Reorder Level</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {lowStock.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">All stocked up</TableCell></TableRow>) : lowStock.map((p: any) => (
+                  {fLowStock.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No matching items</TableCell></TableRow>) : fLowStock.map((p: any) => (
                     <TableRow key={p.id}><TableCell>{p.name}</TableCell><TableCell>{p.sku}</TableCell><TableCell className="text-right">{p.stock}</TableCell><TableCell className="text-right">{p.reorder_level}</TableCell><TableCell className="text-right">{fmt(Number(p.cost || 0) * Number(p.stock || 0))}</TableCell></TableRow>
                   ))}
                 </TableBody>
@@ -321,15 +334,15 @@ function ReportsPage() {
 
         <TabsContent value="dues">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Outstanding Invoices</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(invoices as any, "invoices.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Outstanding Invoices</CardTitle><ExportButtons title="Outstanding Invoices" rows={fInvoices} filename="outstanding-invoices" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Customer</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="text-right">Paid</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {invoices.filter((i: any) => Number(i.total) > Number(i.amount_paid || 0)).map((i: any) => (
+                  {fInvoices.map((i: any) => (
                     <TableRow key={i.id}><TableCell>{i.invoice_no}</TableCell><TableCell>{i.customer_name}</TableCell><TableCell>{i.due_date}</TableCell><TableCell className="text-right">{fmt(i.total)}</TableCell><TableCell className="text-right">{fmt(i.amount_paid)}</TableCell><TableCell className="text-right font-semibold text-rose-500">{fmt(Number(i.total) - Number(i.amount_paid || 0))}</TableCell></TableRow>
                   ))}
-                  {invoices.filter((i: any) => Number(i.total) > Number(i.amount_paid || 0)).length === 0 && (
+                  {fInvoices.length === 0 && (
                     <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">No outstanding invoices</TableCell></TableRow>
                   )}
                 </TableBody>
