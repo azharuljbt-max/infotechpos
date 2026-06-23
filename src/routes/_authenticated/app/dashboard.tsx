@@ -379,6 +379,33 @@ function DashboardPage() {
         })}
       </div>
 
+      {/* Today's snapshot */}
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {[
+          { label: "Daily Bank Transaction", value: fmtMoney(daily?.bank ?? 0), icon: Landmark, accent: "text-[oklch(0.6_0.2_265)]" },
+          { label: "Daily Transactions", value: String(daily?.transactions ?? 0), icon: ArrowLeftRight, accent: "text-[oklch(0.7_0.18_38)]" },
+          { label: "Daily Payment", value: fmtMoney(daily?.payment ?? 0), icon: Banknote, accent: "text-[oklch(0.62_0.16_155)]" },
+          { label: "Daily Due", value: fmtMoney(daily?.dailyDue ?? 0), icon: Clock, accent: "text-[oklch(0.78_0.15_80)]" },
+          { label: "Total Due", value: fmtMoney(daily?.totalDue ?? 0), icon: AlertCircle, accent: "text-[oklch(0.65_0.22_350)]" },
+        ].map((s) => {
+          const Icon = s.icon;
+          return (
+            <Card key={s.label} className="p-3 transition hover:shadow-md">
+              <div className="flex items-center gap-2.5">
+                <div className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted", s.accent)}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-[11px] text-muted-foreground">{s.label}</div>
+                  <div className="truncate text-base font-semibold tracking-tight tabular-nums">{s.value}</div>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+
       {/* Charts */}
       <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3">
         <Card className="p-4 lg:col-span-2">
