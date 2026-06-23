@@ -320,6 +320,9 @@ function ProductsPage() {
             <Field label="Category" error={errors.category}>
               <Input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
             </Field>
+            <Field label="Sub-category" error={errors.subcategory}>
+              <Input value={form.subcategory} onChange={(e) => setForm({ ...form, subcategory: e.target.value })} />
+            </Field>
             <Field label="Unit" error={errors.unit}>
               <Input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} />
             </Field>
