@@ -186,7 +186,19 @@ function ReportsPage() {
           <h1 className="flex items-center gap-2 text-2xl font-semibold"><BarChart3 className="h-6 w-6" /> Reports</h1>
           <p className="text-sm text-muted-foreground">Sales, purchases, expenses, inventory & financial summaries.</p>
         </div>
-        <div className="flex items-end gap-2">
+        <div className="flex flex-wrap items-end gap-2">
+          <div>
+            <Label className="text-xs">Search</Label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search in current report…"
+                className="w-64 pl-8"
+              />
+            </div>
+          </div>
           <div>
             <Label className="text-xs">Date Range</Label>
             <Select value={range} onValueChange={setRange}>
