@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Download, TrendingUp, TrendingDown, DollarSign, Package, AlertTriangle } from "lucide-react";
+import { BarChart3, Download, TrendingUp, TrendingDown, DollarSign, Package, AlertTriangle, FileSpreadsheet, FileText, Search } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 
 export const Route = createFileRoute("/_authenticated/app/reports")({
@@ -41,10 +41,46 @@ function toCSV(rows: Record<string, any>[], filename: string) {
   URL.revokeObjectURL(url);
 }
 
+async function toXLSX(rows: Record<string, any>[], filename: string, sheetName = "Report") {
+  if (!rows.length) return;
+  const XLSX = await import("xlsx");
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+  XLSX.writeFile(wb, filename);
+}
+
+async function toPDF(title: string, rows: Record<string, any>[], filename: string) {
+  if (!rows.length) return;
+  const { default: jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
+  const doc = new jsPDF({ orientation: "landscape" });
+  const headers = Object.keys(rows[0]);
+  doc.setFontSize(14);
+  doc.text(title, 14, 14);
+  doc.setFontSize(9);
+  doc.text(new Date().toLocaleString(), 14, 20);
+  autoTable(doc, {
+    head: [headers],
+    body: rows.map((r) => headers.map((h) => (r[h] == null ? "" : String(r[h])))),
+    startY: 26,
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [40, 40, 40] },
+  });
+  doc.save(filename);
+}
+
+function matches(row: Record<string, any>, q: string) {
+  if (!q) return true;
+  const needle = q.toLowerCase();
+  return Object.values(row).some((v) => v != null && String(v).toLowerCase().includes(needle));
+}
+
 function ReportsPage() {
   const { fmt, symbol } = useCurrency();
   const [range, setRange] = useState("30");
   const [tab, setTab] = useState("sales");
+  const [search, setSearch] = useState("");
 
   const since = useMemo(() => startOf(parseInt(range, 10)), [range]);
 
@@ -133,6 +169,16 @@ function ReportsPage() {
   const expenseByCat = Object.entries(catMap).map(([name, value]) => ({ name, value }));
   const COLORS = ["hsl(var(--primary))", "#10b981", "#f59e0b", "#ef4444", "#6366f1", "#8b5cf6", "#ec4899"];
 
+  // search-filtered views per tab
+  const fSales = (sales as any[]).filter((r) => matches(r, search));
+  const fPurchases = (purchases as any[]).filter((r) => matches(r, search));
+  const fExpenses = (expenses as any[]).filter((r) => matches(r, search));
+  const fLowStock = (lowStock as any[]).filter((r) => matches(r, search));
+  const fInvoices = (invoices as any[])
+    .filter((i: any) => Number(i.total) > Number(i.amount_paid || 0))
+    .filter((r) => matches(r, search));
+  const fTopProducts = topProducts.filter((r) => matches(r as any, search));
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -140,7 +186,19 @@ function ReportsPage() {
           <h1 className="flex items-center gap-2 text-2xl font-semibold"><BarChart3 className="h-6 w-6" /> Reports</h1>
           <p className="text-sm text-muted-foreground">Sales, purchases, expenses, inventory & financial summaries.</p>
         </div>
-        <div className="flex items-end gap-2">
+        <div className="flex flex-wrap items-end gap-2">
+          <div>
+            <Label className="text-xs">Search</Label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search in current report…"
+                className="w-64 pl-8"
+              />
+            </div>
+          </div>
           <div>
             <Label className="text-xs">Date Range</Label>
             <Select value={range} onValueChange={setRange}>
@@ -181,19 +239,19 @@ function ReportsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Sales Trend</CardTitle>
-              <Button size="sm" variant="outline" onClick={() => toCSV(sales as any, "sales.csv")}><Download className="mr-2 h-4 w-4" />Export</Button>
+              <ExportButtons title="Sales Report" rows={fSales} filename="sales" />
             </CardHeader>
             <CardContent className="h-72">
               <ResponsiveContainer><LineChart data={trend}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="day" /><YAxis /><Tooltip formatter={(v: any) => `${symbol}${Number(v).toFixed(2)}`} /><Line type="monotone" dataKey="sales" stroke="hsl(var(--primary))" /></LineChart></ResponsiveContainer>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>Top Products</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Top Products</CardTitle><ExportButtons title="Top Products" rows={fTopProducts as any} filename="top-products" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Product</TableHead><TableHead className="text-right">Qty Sold</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {topProducts.length === 0 ? (<TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No sales in selected period</TableCell></TableRow>) : topProducts.map((p, i) => (
+                  {fTopProducts.length === 0 ? (<TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No matching products</TableCell></TableRow>) : fTopProducts.map((p, i) => (
                     <TableRow key={i}><TableCell>{p.name}</TableCell><TableCell className="text-right">{p.qty}</TableCell><TableCell className="text-right">{fmt(p.revenue)}</TableCell></TableRow>
                   ))}
                 </TableBody>
@@ -204,12 +262,12 @@ function ReportsPage() {
 
         <TabsContent value="purchases">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Purchases</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(purchases as any, "purchases.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Purchases</CardTitle><ExportButtons title="Purchases Report" rows={fPurchases} filename="purchases" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Supplier</TableHead><TableHead>Date</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Total</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {purchases.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No data</TableCell></TableRow>) : purchases.map((p: any) => (
+                  {fPurchases.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No data</TableCell></TableRow>) : fPurchases.map((p: any) => (
                     <TableRow key={p.id}><TableCell>{p.invoice_no}</TableCell><TableCell>{p.supplier_name}</TableCell><TableCell>{p.purchase_date}</TableCell><TableCell><Badge variant="secondary">{p.status}</Badge></TableCell><TableCell className="text-right">{fmt(p.total)}</TableCell></TableRow>
                   ))}
                 </TableBody>
@@ -220,7 +278,7 @@ function ReportsPage() {
 
         <TabsContent value="expenses" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Expenses by Category</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(expenses as any, "expenses.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Expenses by Category</CardTitle><ExportButtons title="Expenses Report" rows={fExpenses} filename="expenses" /></CardHeader>
             <CardContent className="h-72">
               {expenseByCat.length === 0 ? <div className="flex h-full items-center justify-center text-muted-foreground">No expenses</div> : (
                 <ResponsiveContainer><PieChart><Pie data={expenseByCat} dataKey="value" nameKey="name" outerRadius={90} label>{expenseByCat.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}</Pie><Tooltip formatter={(v: any) => `${symbol}${Number(v).toFixed(2)}`} /><Legend /></PieChart></ResponsiveContainer>
@@ -231,7 +289,20 @@ function ReportsPage() {
 
         <TabsContent value="pnl">
           <Card>
-            <CardHeader><CardTitle>Profit & Loss Summary</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Profit & Loss Summary</CardTitle>
+              <ExportButtons
+                title="Profit & Loss Summary"
+                rows={[
+                  { Item: "Revenue (Sales)", Amount: totalSales },
+                  { Item: "Cost of Goods (Purchases)", Amount: -totalPurchases },
+                  { Item: "Gross Profit", Amount: grossProfit },
+                  { Item: "Operating Expenses", Amount: -totalExpenses },
+                  { Item: "Net Profit", Amount: netProfit },
+                ]}
+                filename="profit-loss"
+              />
+            </CardHeader>
             <CardContent className="space-y-3">
               <PnLRow label="Revenue (Sales)" value={fmt(totalSales)} />
               <PnLRow label="Cost of Goods (Purchases)" value={`- ${fmt(totalPurchases)}`} />
@@ -247,12 +318,12 @@ function ReportsPage() {
 
         <TabsContent value="inventory" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Low / Out of Stock</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(lowStock as any, "low-stock.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Low / Out of Stock</CardTitle><ExportButtons title="Low Stock Report" rows={fLowStock} filename="low-stock" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Product</TableHead><TableHead>SKU</TableHead><TableHead className="text-right">Stock</TableHead><TableHead className="text-right">Reorder Level</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {lowStock.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">All stocked up</TableCell></TableRow>) : lowStock.map((p: any) => (
+                  {fLowStock.length === 0 ? (<TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No matching items</TableCell></TableRow>) : fLowStock.map((p: any) => (
                     <TableRow key={p.id}><TableCell>{p.name}</TableCell><TableCell>{p.sku}</TableCell><TableCell className="text-right">{p.stock}</TableCell><TableCell className="text-right">{p.reorder_level}</TableCell><TableCell className="text-right">{fmt(Number(p.cost || 0) * Number(p.stock || 0))}</TableCell></TableRow>
                   ))}
                 </TableBody>
@@ -263,15 +334,15 @@ function ReportsPage() {
 
         <TabsContent value="dues">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Outstanding Invoices</CardTitle><Button size="sm" variant="outline" onClick={() => toCSV(invoices as any, "invoices.csv")}><Download className="mr-2 h-4 w-4" />Export</Button></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Outstanding Invoices</CardTitle><ExportButtons title="Outstanding Invoices" rows={fInvoices} filename="outstanding-invoices" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Invoice</TableHead><TableHead>Customer</TableHead><TableHead>Due</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="text-right">Paid</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {invoices.filter((i: any) => Number(i.total) > Number(i.amount_paid || 0)).map((i: any) => (
+                  {fInvoices.map((i: any) => (
                     <TableRow key={i.id}><TableCell>{i.invoice_no}</TableCell><TableCell>{i.customer_name}</TableCell><TableCell>{i.due_date}</TableCell><TableCell className="text-right">{fmt(i.total)}</TableCell><TableCell className="text-right">{fmt(i.amount_paid)}</TableCell><TableCell className="text-right font-semibold text-rose-500">{fmt(Number(i.total) - Number(i.amount_paid || 0))}</TableCell></TableRow>
                   ))}
-                  {invoices.filter((i: any) => Number(i.total) > Number(i.amount_paid || 0)).length === 0 && (
+                  {fInvoices.length === 0 && (
                     <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground">No outstanding invoices</TableCell></TableRow>
                   )}
                 </TableBody>
@@ -303,6 +374,23 @@ function PnLRow({ label, value, bold, highlight }: { label: string; value: strin
     <div className={`flex items-center justify-between border-b py-2 ${bold ? "font-semibold" : ""}`}>
       <span>{label}</span>
       <span className={highlight === "pos" ? "text-emerald-500" : highlight === "neg" ? "text-rose-500" : ""}>{value}</span>
+    </div>
+  );
+}
+
+function ExportButtons({ title, rows, filename }: { title: string; rows: Record<string, any>[]; filename: string }) {
+  const disabled = !rows || rows.length === 0;
+  return (
+    <div className="flex items-center gap-2">
+      <Button size="sm" variant="outline" disabled={disabled} onClick={() => toPDF(title, rows, `${filename}.pdf`)}>
+        <FileText className="mr-2 h-4 w-4" />PDF
+      </Button>
+      <Button size="sm" variant="outline" disabled={disabled} onClick={() => toXLSX(rows, `${filename}.xlsx`, title)}>
+        <FileSpreadsheet className="mr-2 h-4 w-4" />Excel
+      </Button>
+      <Button size="sm" variant="ghost" disabled={disabled} onClick={() => toCSV(rows, `${filename}.csv`)}>
+        <Download className="mr-2 h-4 w-4" />CSV
+      </Button>
     </div>
   );
 }
