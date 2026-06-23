@@ -41,6 +41,41 @@ function toCSV(rows: Record<string, any>[], filename: string) {
   URL.revokeObjectURL(url);
 }
 
+async function toXLSX(rows: Record<string, any>[], filename: string, sheetName = "Report") {
+  if (!rows.length) return;
+  const XLSX = await import("xlsx");
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, sheetName.slice(0, 31));
+  XLSX.writeFile(wb, filename);
+}
+
+async function toPDF(title: string, rows: Record<string, any>[], filename: string) {
+  if (!rows.length) return;
+  const { default: jsPDF } = await import("jspdf");
+  const { default: autoTable } = await import("jspdf-autotable");
+  const doc = new jsPDF({ orientation: "landscape" });
+  const headers = Object.keys(rows[0]);
+  doc.setFontSize(14);
+  doc.text(title, 14, 14);
+  doc.setFontSize(9);
+  doc.text(new Date().toLocaleString(), 14, 20);
+  autoTable(doc, {
+    head: [headers],
+    body: rows.map((r) => headers.map((h) => (r[h] == null ? "" : String(r[h])))),
+    startY: 26,
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [40, 40, 40] },
+  });
+  doc.save(filename);
+}
+
+function matches(row: Record<string, any>, q: string) {
+  if (!q) return true;
+  const needle = q.toLowerCase();
+  return Object.values(row).some((v) => v != null && String(v).toLowerCase().includes(needle));
+}
+
 function ReportsPage() {
   const { fmt, symbol } = useCurrency();
   const [range, setRange] = useState("30");
