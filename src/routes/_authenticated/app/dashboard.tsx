@@ -231,7 +231,7 @@ function DashboardPage() {
     <>
       <PageHeader
         title="Dashboard"
-        description="Today's performance across your company."
+        description="Performance across your company."
         actions={
           <>
             <Button variant="outline" size="sm">Export</Button>
@@ -240,8 +240,62 @@ function DashboardPage() {
         }
       />
 
+      {/* Date range selector */}
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="inline-flex items-center rounded-md border border-border bg-card p-0.5 shadow-sm">
+          {(["7d", "30d", "90d"] as const).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => { setPreset(p); setCustomRange(undefined); }}
+              className={cn(
+                "rounded px-3 py-1.5 text-xs font-medium transition",
+                preset === p
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+            >
+              {p === "7d" ? "7 days" : p === "30d" ? "30 days" : "90 days"}
+            </button>
+          ))}
+          <Popover open={calOpen} onOpenChange={setCalOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                onClick={() => setPreset("custom")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium transition",
+                  preset === "custom"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                )}
+              >
+                <CalendarIcon className="h-3.5 w-3.5" />
+                Custom
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="range"
+                selected={customRange}
+                onSelect={(r) => {
+                  setCustomRange(r);
+                  setPreset("custom");
+                  if (r?.from && r?.to) setCalOpen(false);
+                }}
+                numberOfMonths={2}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <span className="text-xs text-muted-foreground">{label}</span>
+      </div>
+
       {/* KPIs */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
         {kpis.map((k) => {
           const Icon = k.icon;
           return (
