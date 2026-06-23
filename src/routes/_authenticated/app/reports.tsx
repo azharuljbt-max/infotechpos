@@ -169,6 +169,16 @@ function ReportsPage() {
   const expenseByCat = Object.entries(catMap).map(([name, value]) => ({ name, value }));
   const COLORS = ["hsl(var(--primary))", "#10b981", "#f59e0b", "#ef4444", "#6366f1", "#8b5cf6", "#ec4899"];
 
+  // search-filtered views per tab
+  const fSales = (sales as any[]).filter((r) => matches(r, search));
+  const fPurchases = (purchases as any[]).filter((r) => matches(r, search));
+  const fExpenses = (expenses as any[]).filter((r) => matches(r, search));
+  const fLowStock = (lowStock as any[]).filter((r) => matches(r, search));
+  const fInvoices = (invoices as any[])
+    .filter((i: any) => Number(i.total) > Number(i.amount_paid || 0))
+    .filter((r) => matches(r, search));
+  const fTopProducts = topProducts.filter((r) => matches(r as any, search));
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
