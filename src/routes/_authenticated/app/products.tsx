@@ -176,6 +176,7 @@ function ProductsPage() {
       sku: p.sku ?? "",
       barcode: p.barcode ?? "",
       category: p.category ?? "",
+      subcategory: p.subcategory ?? "",
       unit: p.unit,
       price: Number(p.price),
       cost: Number(p.cost),
