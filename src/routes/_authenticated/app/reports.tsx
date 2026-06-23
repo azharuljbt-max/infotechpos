@@ -239,19 +239,19 @@ function ReportsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Sales Trend</CardTitle>
-              <Button size="sm" variant="outline" onClick={() => toCSV(sales as any, "sales.csv")}><Download className="mr-2 h-4 w-4" />Export</Button>
+              <ExportButtons title="Sales Report" rows={fSales} filename="sales" />
             </CardHeader>
             <CardContent className="h-72">
               <ResponsiveContainer><LineChart data={trend}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="day" /><YAxis /><Tooltip formatter={(v: any) => `${symbol}${Number(v).toFixed(2)}`} /><Line type="monotone" dataKey="sales" stroke="hsl(var(--primary))" /></LineChart></ResponsiveContainer>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>Top Products</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between"><CardTitle>Top Products</CardTitle><ExportButtons title="Top Products" rows={fTopProducts as any} filename="top-products" /></CardHeader>
             <CardContent>
               <Table>
                 <TableHeader><TableRow><TableHead>Product</TableHead><TableHead className="text-right">Qty Sold</TableHead><TableHead className="text-right">Revenue</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {topProducts.length === 0 ? (<TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No sales in selected period</TableCell></TableRow>) : topProducts.map((p, i) => (
+                  {fTopProducts.length === 0 ? (<TableRow><TableCell colSpan={3} className="text-center text-muted-foreground">No matching products</TableCell></TableRow>) : fTopProducts.map((p, i) => (
                     <TableRow key={i}><TableCell>{p.name}</TableCell><TableCell className="text-right">{p.qty}</TableCell><TableCell className="text-right">{fmt(p.revenue)}</TableCell></TableRow>
                   ))}
                 </TableBody>
