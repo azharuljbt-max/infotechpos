@@ -7,7 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ArrowUpRight, ArrowDownRight, TrendingUp, ShoppingCart, Wallet, Receipt,
-  AlertTriangle, Plus, CalendarIcon,
+  AlertTriangle, Plus, CalendarIcon, Landmark, ArrowLeftRight, Banknote, Clock, AlertCircle,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
@@ -93,6 +93,61 @@ function DashboardPage() {
       const purchase = sum(purchasesRes.data, "total");
       const expense = sum(expensesRes.data, "amount");
       return { sales, purchase, expense, profit: sales - purchase - expense };
+    },
+  });
+
+  const { data: daily } = useQuery({
+    queryKey: ["dashboard-daily-due"],
+    queryFn: async () => {
+      const now = new Date();
+      const dayStart = startOfDay(now);
+      const dayEnd = endOfDay(now);
+      const dayStartIso = dayStart.toISOString();
+      const dayEndIso = dayEnd.toISOString();
+      const dayStartDate = dayStartIso.slice(0, 10);
+      const dayEndDate = dayEndIso.slice(0, 10);
+
+      const isBank = (m?: string | null) => {
+        const x = (m ?? "").toLowerCase();
+        return x !== "" && x !== "cash";
+      };
+
+      const [salesToday, purchasesToday, expensesToday, salesAll, purchasesAll] = await Promise.all([
+        supabase.from("sales").select("total, amount_paid, payment_method")
+          .gte("created_at", dayStartIso).lt("created_at", dayEndIso),
+        supabase.from("purchases").select("total, amount_paid, payment_method")
+          .gte("created_at", dayStartIso).lt("created_at", dayEndIso),
+        supabase.from("expenses").select("amount, payment_method")
+          .gte("expense_date", dayStartDate).lt("expense_date", dayEndDate),
+        supabase.from("sales").select("total, amount_paid"),
+        supabase.from("purchases").select("total, amount_paid"),
+      ]);
+
+      const s = salesToday.data ?? [];
+      const p = purchasesToday.data ?? [];
+      const e = expensesToday.data ?? [];
+
+      const bank =
+        s.filter((r: any) => isBank(r.payment_method)).reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        p.filter((r: any) => isBank(r.payment_method)).reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        e.filter((r: any) => isBank(r.payment_method)).reduce((a, r: any) => a + Number(r.amount ?? 0), 0);
+
+      const transactions = s.length + p.length + e.length;
+
+      const payment =
+        s.reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        p.reduce((a, r: any) => a + Number(r.amount_paid ?? 0), 0) +
+        e.reduce((a, r: any) => a + Number(r.amount ?? 0), 0);
+
+      const dailyDue =
+        s.reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0) +
+        p.reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0);
+
+      const totalDue =
+        (salesAll.data ?? []).reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0) +
+        (purchasesAll.data ?? []).reduce((a, r: any) => a + Math.max(0, Number(r.total ?? 0) - Number(r.amount_paid ?? 0)), 0);
+
+      return { bank, transactions, payment, dailyDue, totalDue };
     },
   });
 
@@ -323,6 +378,33 @@ function DashboardPage() {
           );
         })}
       </div>
+
+      {/* Today's snapshot */}
+      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {[
+          { label: "Daily Bank Transaction", value: fmtMoney(daily?.bank ?? 0), icon: Landmark, accent: "text-[oklch(0.6_0.2_265)]" },
+          { label: "Daily Transactions", value: String(daily?.transactions ?? 0), icon: ArrowLeftRight, accent: "text-[oklch(0.7_0.18_38)]" },
+          { label: "Daily Payment", value: fmtMoney(daily?.payment ?? 0), icon: Banknote, accent: "text-[oklch(0.62_0.16_155)]" },
+          { label: "Daily Due", value: fmtMoney(daily?.dailyDue ?? 0), icon: Clock, accent: "text-[oklch(0.78_0.15_80)]" },
+          { label: "Total Due", value: fmtMoney(daily?.totalDue ?? 0), icon: AlertCircle, accent: "text-[oklch(0.65_0.22_350)]" },
+        ].map((s) => {
+          const Icon = s.icon;
+          return (
+            <Card key={s.label} className="p-3 transition hover:shadow-md">
+              <div className="flex items-center gap-2.5">
+                <div className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted", s.accent)}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="truncate text-[11px] text-muted-foreground">{s.label}</div>
+                  <div className="truncate text-base font-semibold tracking-tight tabular-nums">{s.value}</div>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
 
       {/* Charts */}
       <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-3">
