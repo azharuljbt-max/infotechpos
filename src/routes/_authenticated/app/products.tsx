@@ -56,6 +56,7 @@ const productSchema = z.object({
   sku: z.string().trim().max(64).optional().or(z.literal("")),
   barcode: z.string().trim().max(64).optional().or(z.literal("")),
   category: z.string().trim().max(64).optional().or(z.literal("")),
+  subcategory: z.string().trim().max(64).optional().or(z.literal("")),
   unit: z.string().trim().min(1).max(16),
   price: z.coerce.number().min(0),
   cost: z.coerce.number().min(0),
