@@ -268,6 +268,7 @@ function ProductsPage() {
                     <TableCell className="font-medium">{p.name}</TableCell>
                     <TableCell className="text-muted-foreground">{p.sku || "—"}</TableCell>
                     <TableCell className="text-muted-foreground">{p.category || "—"}</TableCell>
+                    <TableCell className="text-muted-foreground">{p.subcategory || "—"}</TableCell>
                     <TableCell className="text-right tabular-nums">{fmt(Number(p.price))}</TableCell>
                     <TableCell className="text-right tabular-nums text-muted-foreground">{fmt(Number(p.cost))}</TableCell>
                     <TableCell className="text-right tabular-nums">
